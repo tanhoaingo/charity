@@ -1,0 +1,15 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-CharitySupportApplication<charity-support>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "mainClass": "com.charity.charitysupport.CharitySupportApplication",
+            "projectName": "charity-support",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
