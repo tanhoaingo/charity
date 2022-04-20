@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./dashboard.css";
 import { DashBoardTab } from "./DashBoardTab";
@@ -9,6 +9,7 @@ import Chart from "react-apexcharts";
 // img
 import coinImg from "../../assets/img/coin.png";
 import { DashBoardTopNav } from "./DashBoardTopNav";
+import axios from "axios";
 
 /**
  * @author
@@ -16,7 +17,54 @@ import { DashBoardTopNav } from "./DashBoardTopNav";
  **/
 
 export const DashBoard = (props) => {
-  const state = {
+  const [statistic, setStatistic] = useState({
+    sumOfAmount: 0,
+    numberOfSupporter: 0,
+    numberOfVolunteer: 0,
+    supporters: [],
+    contributionStatistics: [],
+    organizations: []
+  });
+  const now = new Date();
+  const days = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  function pad(n) {
+    return (n < 10) ? ("0" + n) : n;
+  }
+  function createCategory(numberOfDays) {
+    let categories = []
+    for (let i = 1; i <= numberOfDays; i++) {
+      categories.push(`${pad(i)}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`);
+    }
+    return categories;
+  }
+
+  function createTotalData(dates, contributions) {
+    let total = [];
+    for (let i = 0; i < dates.length; i++) {
+      total.push(0);
+    }
+    contributions.map(item => {
+      if (dates.indexOf(item.createAt) > -1) {
+        total[dates.indexOf(item.createAt)] = item.total;
+      }
+    })
+    return total;
+  }
+
+  function createTimesData(dates, contributions) {
+    let times = [];
+    for (let i = 0; i < dates.length; i++) {
+      times.push(0);
+    }
+    contributions.map(item => {
+      if (dates.indexOf(item.createAt) > -1) {
+        times[dates.indexOf(item.createAt)] = item.times;
+      }
+    })
+    return times;
+  }
+
+  const [state, setState] = useState({
     series: [
       {
         type: "column",
@@ -47,28 +95,7 @@ export const DashBoard = (props) => {
         curve: "smooth",
       },
       xaxis: {
-        categories: [
-          "1/12/2021",
-          "2/12/2021",
-          "3/12/2021",
-          "4/12/2021",
-          "5/12/2021",
-          "6/12/2021",
-          "7/12/2021",
-          "8/12/2021",
-          "9/12/2021",
-          "10/12/2021",
-          "11/12/2021",
-          "12/12/2021",
-          "13/12/2021",
-          "14/12/2021",
-          "15/12/2021",
-          "16/12/2021",
-          "17/12/2021",
-          "18/12/2021",
-          "19/12/2021",
-          "20/12/2021",
-        ],
+        categories: createCategory(days),
       },
       yaxis: [
         {
@@ -88,20 +115,13 @@ export const DashBoard = (props) => {
         align: "left",
       },
     },
-  };
+  });
 
   const state2 = {
-    series: [33000000, 17200000, 27650000, 44225000, 57550000, 45670000],
+    series: statistic.organizations.map(organization => organization.contribution),
     options: {
-      series: [33000000, 17200000, 27650000, 44225000, 57550000, 45670000],
-      labels: [
-        "Hội chữ thập đỏ",
-        "Quỹ tình thương HCM",
-        "Bông sen vàng",
-        "Hội Covid Việt Nam",
-        "Trẻ Em việt Nam",
-        "Từ Thiện Hoài Linh",
-      ],
+      series: statistic.organizations.map(organization => organization.contribution),
+      labels: statistic.organizations.map(organization => organization.name),
       plotOptions: {
         pie: {
           expandOnClick: false,
@@ -182,6 +202,27 @@ export const DashBoard = (props) => {
     },
   };
 
+
+  useEffect(() => {
+    axios.get("http://localhost:8080/statistic/overview").then(res => {
+      console.log(res.data);
+      setStatistic(res.data);
+      setState({
+        ...state,
+        series: [
+          {
+            type: "column",
+            name: "Tiền quyên góp",
+            data: createTotalData(state.options.xaxis.categories, res.data.contributionStatistics)
+          },
+          {
+            name: "Lượt quyên góp",
+            data: createTimesData(state.options.xaxis.categories, res.data.contributionStatistics)
+          },
+        ]
+      })
+    })
+  }, []);
   return (
     <div>
       <div className="dashboard">
@@ -235,9 +276,9 @@ export const DashBoard = (props) => {
                     <span className="name-item">Người ủng hộ</span>
                     <div className="detail-info">
                       <div className="txt-tongcong">Tổng cộng:</div>
-                      <div className="number">1.542</div>
-                      <div className="percent">( 23.5% )</div>
-                      <i class="fas fa-arrow-circle-up"></i>
+                      <div className="number">{statistic.numberOfSupporter}</div>
+                      {/* <div className="percent">( 23.5% )</div>
+                      <i class="fas fa-arrow-circle-up"></i> */}
                     </div>
                   </div>
                 </div>
@@ -250,9 +291,9 @@ export const DashBoard = (props) => {
                     <span className="name-item">Tình nguyện viên</span>
                     <div className="detail-info">
                       <div className="txt-tongcong">Tổng cộng:</div>
-                      <div className="number">442</div>
-                      <div className="percent">( 23.5% )</div>
-                      <i class="fas fa-arrow-circle-down"></i>
+                      <div className="number">{statistic.numberOfVolunteer}</div>
+                      {/* <div className="percent">( 23.5% )</div>
+                      <i class="fas fa-arrow-circle-down"></i> */}
                     </div>
                   </div>
                 </div>
@@ -262,13 +303,13 @@ export const DashBoard = (props) => {
               <h3 className="title">Tổng cộng</h3>
               <div className="total-info__detail">
                 <div className="money">
-                  <span className="vnd">VND</span>
-                  <span className="txt-money">365.300.000</span>
+                  <span className="vnd">VNĐ</span>
+                  <span className="txt-money">{statistic.sumOfAmount.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")}</span>
                 </div>
 
-                <div className="percent">
+                {/* <div className="percent">
                   (11.5%) <i class="fas fa-arrow-circle-up"></i>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
@@ -287,115 +328,34 @@ export const DashBoard = (props) => {
             </div>
             <div className="top-donator">
               <h3 className="title">Người đóng góp nhiều nhất</h3>
-              <div className="list-user">
-                <div className="item-user">
-                  <div className="image">
-                    <img
-                      src="https://img.wattpad.com/cover/194622170-256-k581478.jpg"
-                      alt=""
-                    />
-                  </div>
-                  <div className="info">
-                    <div className="name">Đặng Anh Tú</div>
-                    <div className="type">11 x một lần</div>
-                  </div>
-                  <div className="money">
-                    {" "}
-                    <div className="image-coin">
-                      <img src={coinImg} alt="" />
+              {statistic.supporters.map(supporter =>
+                <div className="list-user">
+                  <div className="item-user">
+                    <div className="image">
+                      <img
+                        src={"https://letters.noticeable.io/" + supporter.avatar}
+                        alt=""
+                      />
                     </div>
-                    <span>35.000.000 </span>
-                    <div className="vnd">VNĐ</div>
-                  </div>
-                </div>
-
-                <div className="item-user">
-                  <div className="image">
-                    <img
-                      src="https://i.pinimg.com/originals/87/96/f7/8796f7a9bb6db1f808dc77ec10b22819.jpg"
-                      alt=""
-                    />
-                  </div>
-                  <div className="info">
-                    <div className="name">Lâm Văn Hồng</div>
-                    <div className="type">15 x một lần</div>
-                  </div>
-                  <div className="money">
-                    {" "}
-                    <div className="image-coin">
-                      <img src={coinImg} alt="" />
+                    <div className="info">
+                      <div className="name">{supporter.fullname} ({supporter.username})</div>
+                      <div className="type">{supporter.times} lần</div>
                     </div>
-                    <span>27.500.000 </span>
-                    <div className="vnd">VNĐ</div>
-                  </div>
-                </div>
-
-                <div className="item-user">
-                  <div className="image">
-                    <img
-                      src="https://i.pinimg.com/474x/3e/20/89/3e2089de20d7bdedc353b4249024cd86.jpg"
-                      alt=""
-                    />
-                  </div>
-                  <div className="info">
-                    <div className="name">Ngô Tấn Hoài</div>
-                    <div className="type">hàng tháng</div>
-                  </div>
-                  <div className="money">
-                    {" "}
-                    <div className="image-coin">
-                      <img src={coinImg} alt="" />
+                    <div className="money">
+                      {" "}
+                      <div className="image-coin">
+                        <img src={coinImg} alt="" />
+                      </div>
+                      <span>{supporter.total.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")}</span>
+                      <div className="vnd">VNĐ</div>
                     </div>
-                    <span>13.500.000 </span>
-                    <div className="vnd">VNĐ</div>
                   </div>
-                </div>
-
-                <div className="item-user">
-                  <div className="image">
-                    <img
-                      src="https://i.pinimg.com/736x/67/f2/7c/67f27c916630f38ba9b4f950009b6209.jpg"
-                      alt=""
-                    />
-                  </div>
-                  <div className="info">
-                    <div className="name">Nguyễn Ngọc Phúc</div>
-                    <div className="type">17 x một lần</div>
-                  </div>
-                  <div className="money">
-                    {" "}
-                    <div className="image-coin">
-                      <img src={coinImg} alt="" />
-                    </div>
-                    <span>12.600.000</span> <div className="vnd">VNĐ</div>
-                  </div>
-                </div>
-
-                <div className="item-user">
-                  <div className="image">
-                    <img
-                      src="https://i.pinimg.com/736x/2a/71/b1/2a71b1f5a4532d43e76c74a1cb25648a.jpg"
-                      alt=""
-                    />
-                  </div>
-                  <div className="info">
-                    <div className="name">Lê Thị Thu Hà</div>
-                    <div className="type">hàng tháng</div>
-                  </div>
-                  <div className="money">
-                    {" "}
-                    <div className="image-coin">
-                      <img src={coinImg} alt="" />
-                    </div>
-                    <span>7.000.000</span> <div className="vnd">VNĐ</div>
-                  </div>
-                </div>
-              </div>
+                </div>)}
             </div>
           </div>
 
           <div className="chart-row2">
-            <div className="main-chart chart2">
+            {/*             <div className="main-chart chart2">
               {" "}
               <h1 className="chart-title">Người dùng mới </h1>
               <Chart
@@ -404,93 +364,29 @@ export const DashBoard = (props) => {
                 height="100%"
                 type="area"
               />
-            </div>
+            </div> */}
             <div className="main-chart chart3">
               <div className="top-donator donator2">
                 <h3 className="title">Tổ chức hoạt động tốt nhất</h3>
                 <div className="list-user">
-                  <div className="item-user">
-                    <div className="image">
-                      <img
-                        src="https://chuthapdophutho.org.vn/uploads/about/1361243602_hotbac.jpg"
-                        alt=""
-                      />
-                    </div>
-                    <div className="info">
-                      <div className="name">Hội chữ thập đỏ</div>
-                      <div className="type">Hồ Chí Minh</div>
-                    </div>
-                    <div className="money">
-                      {" "}
-                      <div className="image-coin">
-                        <img src={coinImg} alt="" />
+                  {statistic.organizations.map((organization, index) =>
+                    <div className="item-user">
+                      <div className="image">
+                        <span class="avatar-number">{index+1}</span>
                       </div>
-                      <span>125.000.000 </span>
-                      <div className="vnd">VNĐ</div>
-                    </div>
-                  </div>
-
-                  <div className="item-user">
-                    <div className="image">
-                      <img
-                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCfmHTVoY34hrPDDfrTHZg1MZECMsrjdYylCgFACW2o0WzPHghVcZj0YfyiY2D-1hXjwE&usqp=CAU"
-                        alt=""
-                      />
-                    </div>
-                    <div className="info">
-                      <div className="name">Hiệp hội bảo trợ trẻ em</div>
-                      <div className="type">Hồ Chí Minh</div>
-                    </div>
-                    <div className="money">
-                      {" "}
-                      <div className="image-coin">
-                        <img src={coinImg} alt="" />
+                      <div className="info">
+                        <div className="name">{organization.name}</div>
+                        <div className="type">{organization.numberOfPost} chương trình</div>
                       </div>
-                      <span>97.000.000 </span>
-                      <div className="vnd">VNĐ</div>
-                    </div>
-                  </div>
-
-                  <div className="item-user">
-                    <div className="image">
-                      <img
-                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTKnScARaSbfLtTDanuwuCm0wVdFUjrRAVQROIUMDP_R9HVIe3I1qFNn6_9aZGLszHjZu8&usqp=CAU"
-                        alt=""
-                      />
-                    </div>
-                    <div className="info">
-                      <div className="name">Hội từ thiện Việt Nam</div>
-                      <div className="type">Hà Nội</div>
-                    </div>
-                    <div className="money">
-                      {" "}
-                      <div className="image-coin">
-                        <img src={coinImg} alt="" />
+                      <div className="money">
+                        {" "}
+                        <div className="image-coin">
+                          <img src={coinImg} alt="" />
+                        </div>
+                        <span>{organization.contribution.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")}</span>
+                        <div className="vnd">VNĐ</div>
                       </div>
-                      <span>80.500.000 </span>
-                      <div className="vnd">VNĐ</div>
-                    </div>
-                  </div>
-
-                  <div className="item-user">
-                    <div className="image">
-                      <img
-                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQcY2q2L4jvIjDxMBPLwl3_idZHLn_-51H1y-c9PAE7n1Ky8Z3IROlpLgblwOvRQoKmW4g&usqp=CAU"
-                        alt=""
-                      />
-                    </div>
-                    <div className="info">
-                      <div className="name">Hội thiện nguyện trái tim yêu thương</div>
-                      <div className="type">Cần Thơ</div>
-                    </div>
-                    <div className="money">
-                      {" "}
-                      <div className="image-coin">
-                        <img src={coinImg} alt="" />
-                      </div>
-                      <span>18.600.000</span> <div className="vnd">VNĐ</div>
-                    </div>
-                  </div>
+                    </div>)}
                 </div>
               </div>
 

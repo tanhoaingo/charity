@@ -11,15 +11,22 @@ import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
+import javax.transaction.Transactional;
+
+import com.charity.charitysupport.DTO.DonationDetails;
 import com.charity.charitysupport.DTO.PostDetails;
 import com.charity.charitysupport.DTO.PostResponse;
+import com.charity.charitysupport.DTO.UpdatedImage;
+import com.charity.charitysupport.entity.Donation;
 import com.charity.charitysupport.entity.Image;
 import com.charity.charitysupport.entity.Post;
+import com.charity.charitysupport.entity.User;
+import com.charity.charitysupport.entity.Volunteer;
 import com.charity.charitysupport.repository.ImageRepository;
 import com.charity.charitysupport.repository.PostRepository;
+import com.charity.charitysupport.repository.VolunteerRepository;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.AllArgsConstructor;
@@ -31,6 +38,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final ImageRepository imageRepository;
     private final AuthService authService;
+    private final VolunteerRepository volunteerRepository;
 
     @Transactional
     public void create(MultipartFile[] files, String[] description,
@@ -38,7 +46,8 @@ public class PostService {
             String expectation, String expirationDate,
             String type, String content) {
 
-        LocalDateTime remainingDay = LocalDateTime.now().plusDays(Integer.valueOf(expirationDate));
+        LocalDateTime remainingDay = LocalDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonth(),
+                LocalDateTime.now().getDayOfMonth(), 0, 0, 0).plusDays(Integer.valueOf(expirationDate));
         Post post = new Post();
         post.setPoster(authService.getCurrentUser());
         post.setTitle(title);
@@ -103,14 +112,14 @@ public class PostService {
         return outputStream.toByteArray();
     }
 
-    public List<PostResponse> getAll() {
+    public List<PostResponse> getAll(boolean includeExpiration) {
         List<Post> posts = postRepository.findAll();
 
         List<PostResponse> listPostResponse = new ArrayList<>();
 
         for (Post post : posts) {
-            Long remainingDay = (post.getExpirationDate().getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24);
-            if (remainingDay > 0) {
+            Long remainingDay = (post.getExpirationDate().getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24) + 1;
+            if (includeExpiration ? true : remainingDay > 0) {
                 byte[] image = post.getImages().isEmpty() ? null
                         : decompressBytes(post.getImages().get(0).getImgByte());
 
@@ -125,16 +134,83 @@ public class PostService {
         return listPostResponse;
     }
 
+
     public PostDetails getById(Long id) {
         Post post = postRepository.getById(id);
-        Long remainingDay = (post.getExpirationDate().getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24);
-        
+        Long remainingDay = (post.getExpirationDate().getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24) + 1;
+        List<DonationDetails> list = new ArrayList<>();
         for (Image image : post.getImages()) {
             image.setImgByte(decompressBytes(image.getImgByte()));
         }
+        for (int i =  post.getDonations().size() - 1; i >= 0; i--) {
+            Donation donation = post.getDonations().get(i);
+
+            DonationDetails donationDetails = new DonationDetails();
+            donationDetails.setFullname(donation.getUser().getFullname());
+            donationDetails.setAmount(donation.getAmount());
+            donationDetails.setCreateAt(donation.getCreateAt());
+            donationDetails.setAvatar(donation.getUser().getAvatar());
+            donationDetails.setIsAnonymous(donation.getIsAnonymous());
+            list.add(donationDetails);
+        }
+
+        String status = "CHƯA ĐĂNG NHẬP";
+        if(authService.isLoggedIn()){
+            User user = authService.getCurrentUser();
+            Volunteer volunteer = volunteerRepository.findByUserAndPost(user.getId(), post.getId()).orElse(new Volunteer(0L, new Date(), "ĐĂNG KÝ TÌNH NGUYỆN VIÊN", null, null));
+            status = volunteer.getStatus();
+        }
         return PostDetails.builder().id(post.getId()).title(post.getTitle()).organization(post.getOrganization())
-                .type(post.getType()).postDate(post.getPostDate()).remainingDay(remainingDay).content(post.getContent().split("\r\n"))
+                .type(post.getType()).postDate(post.getPostDate()).remainingDay(remainingDay)
+                .content(post.getContent().split("\r\n"))
                 .contribution(post.getContribution()).expectation(post.getExpectation()).images(post.getImages())
+                .donationDetails(list)
+                .volunteer(status)
+                .numberOfVolunteers(volunteerRepository.findByStatusAndPost("ĐÃ TRỞ THÀNH TÌNH NGUYỆN VIÊN", post.getId()).size())
                 .build();
+    }
+
+    @Transactional
+    public void update(Long id, MultipartFile[] files, String[] description,
+            String title, String organization,
+            String expectation, String expirationDate,
+            String type, String content, List<UpdatedImage> updatedImages) {
+
+        LocalDateTime remainingDay = LocalDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonth(),
+                LocalDateTime.now().getDayOfMonth(), 0, 0, 0).plusDays(Integer.valueOf(expirationDate));
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Can't find post with id: " + id));
+        post.setPoster(authService.getCurrentUser());
+        post.setTitle(title);
+        post.setOrganization(organization);
+        post.setType(type);
+        post.setContent(content);
+        post.setExpectation(BigDecimal.valueOf(Long.valueOf(expectation)));
+        post.setPostDate(new Date());
+        post.setExpirationDate(java.sql.Timestamp.valueOf(remainingDay));
+        postRepository.save(post);
+
+        for (int i = 0; i < files.length; i++) {
+            Image image = new Image();
+            image.setDescription(description[i]);
+            try {
+                image.setImgByte(compressBytes(files[i].getBytes()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            image.setPost(post);
+            imageRepository.save(image);
+        }
+
+        for (UpdatedImage updatedImage : updatedImages) {
+            if (updatedImage.isDeleted()) {
+                imageRepository.deleteById(updatedImage.getId());
+            } else {
+                Image img = imageRepository.findById(updatedImage.getId())
+                        .orElseThrow(() -> new RuntimeException("Can't find image with id: " + updatedImage.getId()));
+                img.setDescription(updatedImage.getDescription());
+                imageRepository.save(img);
+            }
+        }
     }
 }

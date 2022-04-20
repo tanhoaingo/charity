@@ -51,5 +51,6 @@ public class Post {
     private List<Image> images;
 
     @OneToMany(mappedBy = "post")
+    @JsonManagedReference
     private List<Volunteer> volunteers;
 }

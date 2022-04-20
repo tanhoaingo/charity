@@ -1,12 +1,13 @@
 import axios from "axios";
-import { useState } from "react"
-
+import { useEffect, useState } from "react"
+import { useDispatch } from 'react-redux';
+import { getEntire } from "../../action/post";
 const usePost = (validatePost) => {
     const [values, setValues] = useState({
         title: '',
         organization: '',
-        expectation: '',
-        expirationDate: '',
+        expectation: 0,
+        expirationDate: 0,
         type: '',
         content: ''
     });
@@ -14,6 +15,8 @@ const usePost = (validatePost) => {
     const [row, setRow] = useState(1);
     const [files, setFiles] = useState([]);
     const [desc, setDesc] = useState([]);
+    const [oldImages, setOldImages] = useState([]);
+    const dispatch = useDispatch();
 
     const handleChange = e => {
         const { name, value } = e.target;
@@ -47,7 +50,7 @@ const usePost = (validatePost) => {
             formData.append("description", desc);
 
             axios({
-                method: 'POST', url: "http://localhost:8080/post/create", data: formData, headers: {"Navigation": "http://localhost:3001/createpost-success"}
+                method: 'POST', url: "http://localhost:8080/post/create", data: formData, headers: { "Navigation": "http://localhost:3001/createpost-success" }
             }).then((res) => {
                 if (res.status == 200) {
                     window.location.href = "http://localhost:3001/createpost-success";
@@ -89,7 +92,65 @@ const usePost = (validatePost) => {
         des[e.target.name] = e.target.value;
         setDesc(des);
     }
-    return { values, errors, row, files, desc, handleChange, handleTypeChange, handleSubmit, handleTxtAreaChange, handleUpload, handleDescChange };
+    const handleOldDescUpdate = (e) => {
+        let imgs = [...oldImages];
+        imgs[e.target.name].description = e.target.value;
+        setDesc(imgs);
+    }
+    function handleLoad(data) {
+        console.log(data);
+        setRow(data.content.length * 2);
+        setValues({
+            title: data.title,
+            organization: data.organization,
+            expectation: data.expectation,
+            expirationDate: data.remainingDay,
+            type: data.type,
+            content: data.content.join("\r\n")
+        });
+        let images = [];
+        data.images.map(image => {
+            images.push({
+                id: image.id,
+                imgByte: image.imgByte,
+                description: image.description,
+                isDeleted: false
+            })
+        })
+        setOldImages(images);
+    }
+    const clickDeleteButton = (e) => {
+        e.preventDefault();
+        let imgs = [...oldImages];
+        imgs[e.target.name].isDeleted = !imgs[e.target.name].isDeleted;
+        setDesc(imgs);
+    }
+    function handleUpdate(id) {
+        let err = validatePost(values);
+        setErrors(err);
+        if (Object.keys(err).length === 0) {
+            const formData = new FormData();
+            for (const element of files) {
+                formData.append(`files`, element);
+            }
+            formData.append("title", values.title);
+            formData.append("organization", values.organization);
+            formData.append("expectation", values.expectation);
+            formData.append("expirationDate", values.expirationDate);
+            formData.append("type", values.type);
+            formData.append("content", values.content);
+            formData.append("description", desc);
+            formData.append(`oldImages`, JSON.stringify(oldImages));
+
+            axios({
+                method: 'PUT', url: "http://localhost:8080/post/update/" + id, data: formData, headers: { "Navigation": "http://localhost:3001/dashboard/postadmin" }
+            }).then(() => {
+                dispatch(getEntire());
+            });
+            
+        }
+    }
+    return { values, errors, row, files, oldImages, desc, handleChange, handleTypeChange, handleSubmit, handleTxtAreaChange, handleUpload, handleDescChange, handleLoad, handleOldDescUpdate, clickDeleteButton, handleUpdate };
 };
 
 export default usePost;

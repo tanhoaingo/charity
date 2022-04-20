@@ -23,14 +23,36 @@ export const PayPage = (props) => {
   // simple timer
   const [method, setMethod] = useState("0");
   function HandleEventSelect(e) {
+    switch(e.target.value){
+      case "1":{
+        props.setDonation({
+          ...props.donation,
+          paymentMethod: "Credit Card"
+        });
+        break;
+      }
+      case "2":{
+        props.setDonation({
+          ...props.donation,
+          paymentMethod: "Viettel Pay"
+        });
+        break;
+      }
+      case "3":{
+        props.setDonation({
+          ...props.donation,
+          paymentMethod: "MoMo"
+        });
+        break;
+      }
+      default:
+        break
+    }
     setMethod(e.target.value);
   }
   return (
     <div className="paypage">
-      <PayHeader />
-
-      <div className="method-select__title">Chọn phương thức thanh toán</div>
-
+      <div className="title-session">Chọn phương thức thanh toán</div>
       <div className="method-select">
         <label className="method-item">
           <input
@@ -40,7 +62,6 @@ export const PayPage = (props) => {
             name="method"
             id="1"
           />
-
           <div className="radio-btn">
             <i class="fas fa-check-circle"></i>
             <div className="radio-btn-inside">
@@ -51,7 +72,6 @@ export const PayPage = (props) => {
             </div>
           </div>
         </label>
-
         <label className="method-item">
           <input
             value="2"
@@ -70,7 +90,6 @@ export const PayPage = (props) => {
             </div>
           </div>
         </label>
-
         <label className="method-item">
           <input
             value="3"
@@ -79,7 +98,6 @@ export const PayPage = (props) => {
             name="method"
             id="1"
           />
-
           <div className="radio-btn">
             <i class="fas fa-check-circle"></i>
             <div className="radio-btn-inside">
@@ -174,7 +192,7 @@ export const PayPage = (props) => {
                   </div>
                 </div>
               </div>
-              <Link to="/paying-complete">Xác nhận</Link>
+              {/* <Link to="/paying-complete">Xác nhận</Link> */}
             </div>
           </div>
 

@@ -1,9 +1,11 @@
 package com.charity.charitysupport.service;
 
 import java.time.Instant;
+import java.util.Random;
 import java.util.UUID;
 
 import com.charity.charitysupport.DTO.AuthenticationResponse;
+import com.charity.charitysupport.DTO.Profile;
 import com.charity.charitysupport.DTO.LoginRequest;
 import com.charity.charitysupport.DTO.NotificationMail;
 import com.charity.charitysupport.DTO.RefreshTokenRequest;
@@ -43,9 +45,11 @@ public class AuthService {
         User user = new User();
 
         user.setUsername(request.getUsername());
+        user.setFullname(request.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setEmail(request.getEmail());
         user.setPhoneNumber(request.getPhoneNumber());
+        user.setAvatar(String.valueOf(request.getUsername().charAt(0)).toUpperCase() + new Random().nextInt(19) + ".svg");
         user.setEnable(false);
 
         userRepository.save(user);
@@ -69,10 +73,13 @@ public class AuthService {
         return token;
     }
 
+    @Transactional
     public void verifyAccount(String token) {
         VerificationToken verificationToken = verificationRepository.findByToken(token)
                 .orElseThrow(() -> new RuntimeException("Invalid Token"));
         fetchUserAndEnable(verificationToken);
+        System.out.println(verificationToken.getId());
+        verificationRepository.deleteById(verificationToken.getId());
     }
 
     private void fetchUserAndEnable(VerificationToken verificationToken) {
@@ -110,6 +117,22 @@ public class AuthService {
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
+    public Profile getProfile(){
+        if(!this.isLoggedIn()){
+            return null;
+        } else {
+            User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            Profile profile = new Profile();
+            profile.setUsername(user.getUsername());
+            profile.setFullname(user.getFullname());
+            profile.setEmail(user.getEmail());
+            profile.setPhoneNumber(user.getPhoneNumber());
+            profile.setAddress(user.getAddress());
+            profile.setDescription(user.getDescription());
+            profile.setAvatar(user.getAvatar());
+            return profile; 
+        }
+    }
     public boolean isAdmin(){
         try {
             User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -118,4 +141,5 @@ public class AuthService {
             return false;
         }
     }
+
 }

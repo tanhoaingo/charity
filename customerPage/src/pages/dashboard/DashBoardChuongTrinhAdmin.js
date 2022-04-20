@@ -24,7 +24,7 @@ import post1Img from "../../assets/img/homePagePost/post1.jpg";
 // toast
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import { useSelector, useDispatch } from "react-redux";
 // json
 import {
   useTable,
@@ -37,13 +37,21 @@ import donateUserJson from "../../assets/JsonData/PostAdminJson.json";
 import { COLUMNS } from "../../assets/JsonData/ColumnPostAdmin";
 import { Filter } from "../analysic/Filter";
 import { DashBoardTopNav } from "./DashBoardTopNav";
-
+import { getEntire } from '../../action/post'
 /**
  * @author
  * @function DashBoardChuongTrinhAdmin
  **/
 
 export const DashBoardChuongTrinhAdmin = (props) => {
+  const posts = useSelector(state => state.post.data);
+  const dispatch = useDispatch();
+
+  console.log(posts);  
+  useEffect(() => {
+    dispatch(getEntire());
+  }, [dispatch]);
+
   const options = [
     { value: "", label: "Tất cả" },
     { value: "8", label: "Tháng 8" },
@@ -116,7 +124,7 @@ export const DashBoardChuongTrinhAdmin = (props) => {
     setGlobalFilter(e.value);
   };
   const columns = useMemo(() => COLUMNS, []);
-  const data = useMemo(() => donateUserJson, []);
+  const data = useMemo(() => posts, [posts]); 
   const tableInstance = useTable(
     {
       columns,

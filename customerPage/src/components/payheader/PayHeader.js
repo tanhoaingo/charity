@@ -10,10 +10,11 @@ import { Link } from "react-router-dom";
  **/
 
 export const PayHeader = (props) => {
+  const queryParams = new URLSearchParams(window.location.search);
   return (
     <div className="payheader">
       <div className="payheader__btn">
-        <Link to={props.type === "xacnhan" ? "/paying" : "/donate"}>
+        <Link to={"/post?id=" + queryParams.get("id")}>
           Quay lại
         </Link>
       </div>

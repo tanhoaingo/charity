@@ -26,4 +26,9 @@ public class PostDetails {
     private BigDecimal contribution;
     private BigDecimal expectation;
     private List<Image> images;
+    private List<DonationDetails> donationDetails;
+    private String volunteer;
+    private Integer numberOfVolunteers;
 }
+
+

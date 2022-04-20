@@ -267,3 +267,24 @@
   width: 100%;
   object-fit: contain;
 }
+
+.post-page__above button {
+  background-color: var(--third-color-green);
+  color: white;
+  padding: 16px 26px;
+  display: block;
+  width: 260px;
+  border-radius: 5px;
+  margin: 10px;
+  margin-top: 20px;
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+.post-page__above button.volunteer {
+  text-transform: uppercase;
+  text-align: center;
+  padding-top: 18px;
+}
+.post-page__above button.volunteer:hover {
+  opacity: 0.8;
+}

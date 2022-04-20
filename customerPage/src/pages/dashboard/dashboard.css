@@ -459,3 +459,17 @@
   margin-left: 100px;
   margin-bottom: 30px;
 }
+
+.avatar-number {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  line-height: 35px;
+  padding: 2px;
+  text-align: center;
+  border-radius: 50%;
+  background: #ccccff;
+  font-size: 30px;
+  vertical-align: middle; 
+  font-weight: 900;
+}

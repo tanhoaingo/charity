@@ -10,8 +10,8 @@ export const ProfileTab = (props) => {
   return (
     <div>
       <div className="list">
-        <img src={Img} alt="" />
-        <div className="user-name">Lâm Hồng</div>
+        <img src={"https://letters.noticeable.io/" + props.avatar} alt="" />
+        <div className="user-name">{props.fullname}</div>
         <div className="list-tab">
           <Link to="/profile">
             <div className={props.tab === "account" ? "item active" : "item"}>

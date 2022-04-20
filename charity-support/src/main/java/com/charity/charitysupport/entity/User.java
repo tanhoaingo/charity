@@ -6,18 +6,15 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -45,35 +42,27 @@ public class User implements UserDetails {
         private String email;
         @Column(unique = true)
         private String phoneNumber;
-        private String address;
-        private String description;
-        private BigDecimal total;
+        private String address = "";
+        private String description = "";
+        private BigDecimal total = BigDecimal.valueOf(0L);
         private boolean enable;
         private String role = "USER";
+        private String avatar;
+        private Integer point = 0;
 
-        @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-        @JoinTable(name = "users_volunteers", joinColumns = {
-                        @JoinColumn(name = "user_id", referencedColumnName = "id")
-        }, inverseJoinColumns = {
-                        @JoinColumn(name = "volunteer_id", referencedColumnName = "id")
-        })
+        @OneToMany(mappedBy = "user")
+        @JsonManagedReference
         private List<Volunteer> volunteers;
 
-        @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-        @JoinTable(name = "users_donations", joinColumns = {
-                        @JoinColumn(name = "user_id", referencedColumnName = "id")
-        }, inverseJoinColumns = {
-                        @JoinColumn(name = "donation_id", referencedColumnName = "id")
-        })
+        @OneToMany(mappedBy = "user")
+        @JsonManagedReference
         private List<Donation> donations;
 
         @OneToMany(mappedBy = "poster")
+        @JsonManagedReference
         private List<Post> posts;
 
-        @OneToMany(mappedBy = "approver")
-        private List<Volunteer> approvedList;
-
-        @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
+        @OneToOne(mappedBy = "user")
         private VerificationToken verificationToken;
 
         @Override

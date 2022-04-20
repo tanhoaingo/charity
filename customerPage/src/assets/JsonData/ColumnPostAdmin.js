@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { EnumData } from "./enumData";
 
 import charityImg from "../../assets/img/charity.gif";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Select from "react-select";
 
 import { CKEditor } from "@ckeditor/ckeditor5-react";
@@ -12,7 +12,12 @@ import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 // toast
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import axios from "axios";
+import usePost from "../../util/post/usePost";
+import validatePost from "../../util/post/validatePost";
+import "../../pages/post/createpost/image.css";
+import {useDispatch} from 'react-redux'
+import { getEntire } from "../../action/post";
 export const COLUMNS = [
   {
     Header: "Hình ảnh",
@@ -30,8 +35,8 @@ export const COLUMNS = [
 
   {
     Header: "Đã nhận",
-    Footer: "danhan",
-    accessor: "danhan",
+    Footer: "progress",
+    accessor: "progress",
   },
   //   {
   //     Header: "Ngày",
@@ -55,8 +60,8 @@ export const COLUMNS = [
   //   },
   {
     Header: "Tổ chức",
-    Footer: "owner",
-    accessor: "owner",
+    Footer: "organization",
+    accessor: "organization",
     // Cell: (tableProps) => (
     //   <span>{EnumData[tableProps.row.original.owner - 1]}</span>
     // ),
@@ -68,32 +73,33 @@ export const COLUMNS = [
   },
   {
     Header: "Thời hạn",
-    Footer: "time",
-    accessor: "time",
+    Footer: "remainingDay",
+    accessor: "remainingDay",
     Cell: (tableProps) => (
       <span
         className={
-          tableProps.row.original.time === 0
+          tableProps.row.original.remainingDay === 0
             ? "status d0"
-            : tableProps.row.original.time < 3
-            ? "status d3"
-            : tableProps.row.original.time < 10
-            ? "status d10"
-            : "status d100"
+            : tableProps.row.original.remainingDay < 3
+              ? "status d3"
+              : tableProps.row.original.remainingDay < 10
+                ? "status d10"
+                : "status d100"
         }
       >
-        {tableProps.row.original.time === 0
+        {tableProps.row.original.remainingDay === 0
           ? "đã hoàn thành"
-          : "còn " + tableProps.row.original.time + " ngày"}
+          : "còn " + tableProps.row.original.remainingDay + " ngày"}
       </span>
     ),
   },
   {
     Header: "",
-    Footer: "necess",
-    accessor: "necess",
+    Footer: "action",
+    accessor: "action",
 
     Cell: (tableProps) => {
+      const { values, errors, row, files, oldImages, desc, handleChange, handleTypeChange, handleTxtAreaChange, handleUpload, handleDescChange, handleLoad, handleOldDescUpdate, clickDeleteButton, handleUpdate } = usePost(validatePost);
       const [openModal, setOpenModal] = useState(false);
       const optionMonth = [
         { value: 1, label: "Tháng 7" },
@@ -113,7 +119,7 @@ export const COLUMNS = [
 
       // toast
       const notify = () => {
-        if (true) {
+        if (openModal) {
           toast.success("🎄 Đã chỉnh sửa thành công", {
             position: "top-right",
             autoClose: 5222,
@@ -123,7 +129,7 @@ export const COLUMNS = [
             draggable: true,
             progress: undefined,
             width: "500px",
-          });
+          }); 
           setOpenModal(false);
         }
       };
@@ -160,29 +166,34 @@ export const COLUMNS = [
       const [addDate, setVal] = useState("");
       const [addedDate, showData] = useState(0);
 
-      const handleChange = (e, editor) => {
-        const data = editor.getData();
-        setVal(data);
-      };
+      /*       const handleChange = (e, editor) => {
+              const data = editor.getData();
+              setVal(data);
+            }; */
       const options = [
-        { value: "", label: "Covid 19" },
-        { value: "8", label: "Trẻ em" },
-        { value: "9", label: "Người già" },
-        { value: "89", label: "Người khuyết tật" },
-        { value: "86", label: "Ghép tim" },
-        { value: "834", label: "Người khó khăn" },
+        { value: "Covid 19", label: "Covid 19" },
+        { value: "Trẻ em", label: "Trẻ em" },
+        { value: "Người già", label: "Người già" },
+        { value: "Người khuyết tật", label: "Người khuyết tật" },
+        { value: "Ghép tim", label: "Ghép tim" },
+        { value: "Người khó khăn", label: "Người khó khăn" },
       ];
 
       return (
         <span>
-          <Link to="/post">
+          <Link to={"/post?id=" + tableProps.row.original.id}>
             <i class="btn-see far fa-eye"></i>
           </Link>
           <Link to="/analysic">
             <i class="btn-see fas fa-chart-line"></i>
           </Link>
 
-          <i onClick={() => setOpenModal(true)} class="btn-see far fa-edit"></i>
+          <i onClick={() => {
+            axios.get("http://localhost:8080/post/get/" + tableProps.row.original.id).then(res => {
+              handleLoad(res.data);
+            });
+            setOpenModal(true)
+          }} class="btn-see far fa-edit"></i>
 
           <div
             className={
@@ -199,6 +210,11 @@ export const COLUMNS = [
                 <i class="fas fa-times"></i>
               </div>
               <h2 className="title">Chỉnh sửa thông tin</h2>
+              <form onSubmit={(e) => {
+                  e.preventDefault();
+                  notify();
+                  handleUpdate(tableProps.row.original.id);               
+                }}>
               <div className="create-post-page dashboard">
                 <div className="upload-form__wrapper">
                   <div className="input-info">
@@ -206,62 +222,73 @@ export const COLUMNS = [
                       Thông tin cơ bản về chương trình
                     </h3>
                     <div className="input-session name">
-                      <input
-                        type="text"
-                        defaultValue="Hỗ trợ trẻ em vùng cao"
-                        placeholder="Nhập tên chương trình"
-                      />
+                      <input type="text" placeholder="Nhập tên chương trình" name="title" onChange={handleChange} value={values.title} />
                     </div>
+                    {errors.title && <p style={{ color: 'red', fontSize: 'small' }}>{errors.title}</p>}
+                    <div className="input-session name">
+                      <input type="text" placeholder="Nhập tên tổ chức" name="organization" onChange={handleChange} value={values.organization} />
+                    </div>
+                    {errors.organization && <p style={{ color: 'red', fontSize: 'small' }}>{errors.organization}</p>}
                     <div className="input-number">
                       <div className="input-session name">
-                        <input
-                          type="text"
-                          defaultValue="65.000.000"
-                          placeholder="Nhập số tiền"
-                        />
+                        <input type="number" placeholder="Nhập số tiền" name="expectation" onChange={handleChange} value={values.expectation}/>
                       </div>
                       <span>[ Đơn vị : VNĐ ]</span>
 
                       <div className="input-session time">
-                        <input
-                          defaultValue="50"
-                          type="text"
-                          placeholder="Nhập thời gian"
-                        />
+                        <input type="number" placeholder="Nhập thời gian" name="expirationDate" onChange={handleChange} value={values.expirationDate} />
                       </div>
                       <span>[ Đơn vị : ngày ]</span>
                     </div>
+                    <div className="input-number">
+                      {errors.expectation && <p style={{ color: 'red', fontSize: 'small' }}>{errors.expectation}</p>}
+                      {errors.expirationDate && <p style={{ color: 'red', fontSize: 'small', marginLeft: '235px' }}>{errors.expirationDate}</p>}
+                    </div>
                     <div className="select-session">
                       <Select
-                        defaultValue="Người già"
-                        placeholder="Chọn loại"
+                        placeholder={values.type}
                         className="honghong type"
                         options={options}
+                        name="type" onChange={handleTypeChange}
                       />
-                      <div className="input-file">
-                        {" "}
-                        <input id="fusk" type="file" name="photo" accept="image/*"></input>{" "}
-                        <label for="fusk">Chọn hình</label>
+                      <div className="img-div">
+                        <input type="file" accept="image/*" multiple name="image-upload" id="input" onChange={handleUpload} formEncType="multipart/form-data" />
+                        <div className="label">
+                          <label className="image-upload" htmlFor="input">
+                            <p className="img-select"></p>
+                            <p className="img-select">Thêm hình ảnh</p>
+                          </label>
+                        </div>
                       </div>
+                    </div>
+                    {errors.type && <p style={{ color: 'red', fontSize: 'small' }}>{errors.type}</p>}
+                    <div className="select-session">
+                      {oldImages.map((image, index) => {
+                        return (<div className="img-page">
+                          <button className={image.isDeleted ? "btn-undo" : "btn-delete"} onClick={clickDeleteButton} name={index}>{image.isDeleted ? "Hoàn tác" : "Xoá"}</button>
+                          <div className="img-holder">
+                            <img src={image.isDeleted ? "" : 'data:image/jpeg;base64,' + image.imgByte} alt="" id="img" className="img" />
+                          </div>
+                          <input type="text" className="desc-input" placeholder="Thêm chú thích" name={index} onChange={handleOldDescUpdate} value={oldImages[index].description} disabled={image.isDeleted}></input>
+                        </div>)
+                      })}
+                      {files.map((file, index) => {
+                        return (<div className="img-page">
+                          <div className="img-holder" style={{'margin-top': '21px'}}>
+                            <img src={URL.createObjectURL(file)} alt="" id="img" className="img" />
+                          </div>
+                          <input type="text" className="desc-input" placeholder="Thêm chú thích" name={index} onChange={handleDescChange} value={desc[index]}></input>
+                        </div>)
+                      })}
                     </div>
                   </div>
                   <h3 className="h3title">
                     Thông tin chi tiết về chương trình
                   </h3>
                   <div className="upload-form">
-                    <CKEditor
-                      className="ckeditor"
-                      editor={ClassicEditor}
-                      data={addDate}
-                      onChange={handleChange}
-                    />
-                    <a href="#">
-                      {" "}
-                      <button onClick={notify} className="btn-show-demo">
-                        Hoàn tất
-                      </button>
-                    </a>
-
+                    <textarea onChange={handleTxtAreaChange} rows={row} className="txtArea" value={values.content}></textarea>
+                    {errors.content && <p style={{ color: 'red', fontSize: 'small' }}>{errors.content}</p>}
+                    <button className="btn-show-demo" type="submit">Hoàn tất</button>
                     <div>{addedDate ? ReactHtmlParser(addDate) : ""}</div>
                   </div>
 
@@ -278,6 +305,7 @@ export const COLUMNS = [
                   </div>
                 </div>
               </div>
+              </form>
             </div>
           </div>
         </span>

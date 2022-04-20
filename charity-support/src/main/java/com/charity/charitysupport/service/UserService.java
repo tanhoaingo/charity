@@ -1,0 +1,51 @@
+package com.charity.charitysupport.service;
+
+import java.util.Random;
+
+import com.charity.charitysupport.DTO.ChangePasswordRequest;
+import com.charity.charitysupport.DTO.Profile;
+import com.charity.charitysupport.entity.User;
+import com.charity.charitysupport.repository.UserRepository;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import lombok.AllArgsConstructor;
+
+@Service
+@AllArgsConstructor
+public class UserService {
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    public void updateProfile(Profile profile) {
+        User user = userRepository.findByUsername(profile.getUsername())
+                .orElseThrow(() -> new RuntimeException("Can't find user with username: " + profile.getUsername()));
+
+        user.setFullname(profile.getFullname());
+        user.setAddress(profile.getAddress());
+        user.setDescription(profile.getDescription());
+        user.setAvatar(this.createAvatar(profile.getFullname()));
+
+        userRepository.save(user);
+    }
+
+    public boolean updatePassword(ChangePasswordRequest request) {
+        User user = userRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new RuntimeException("Can't find user with username: " + request.getUsername()));
+        if (passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+            userRepository.save(user);
+            return true;
+        } else
+            return false;
+    }
+
+    public String createAvatar(String fullname) {
+        String[] array = fullname.trim().replaceAll("( )+", " ").split(" ");
+        String first = String.valueOf(array[0].charAt(0)).toUpperCase();
+        String last = String.valueOf(array[array.length - 1].charAt(0)).toUpperCase();
+        return array.length == 1 ? first + new Random().nextInt(19) + ".svg"
+                : first + last + new Random().nextInt(19) + ".svg";
+    }
+}

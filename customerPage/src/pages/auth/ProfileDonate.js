@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Header } from "../../components/header/Header";
 import "./profile.css";
 // toast
@@ -7,6 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 import { ProfileTab } from "./ProfileTab";
 import { Link } from "react-router-dom";
+import axios from "axios";
 /**
  * @author
  * @function ProfileDonate

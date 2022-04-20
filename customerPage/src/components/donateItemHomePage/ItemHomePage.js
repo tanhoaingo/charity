@@ -18,7 +18,7 @@ export const ItemHomePage = ({ ...props }) => {
     <div className="donate-item">
       <Link to={"/post?id=" + props.post.id} onClick={handleToTop}>
         <div className="image">
-          <img src={'data:image/jpeg;base64,' + props.post.image} alt="" />
+          <img src={'data:image/jpeg;base64,' + props.post.image} alt="" className="main-img"/>
         </div>
       </Link>
       <div className="donate-item__body">
@@ -32,7 +32,7 @@ export const ItemHomePage = ({ ...props }) => {
           {props.post.title}
         </div>
         <div className="below-desc">
-          <ProgressBar completed={(props.post.contribution / props.post.expectation) * 100} />
+          <ProgressBar completed={((props.post.contribution / props.post.expectation) * 100).toFixed(2)} />
           {/* <div className="status-bar item2">
             <span></span>
           </div> */}

@@ -9,8 +9,6 @@ import { Header } from "../../../components/header/Header";
 // css
 import "./postpage.css";
 
-
-
 /**
  * @author
  * @function PostPage
@@ -32,23 +30,63 @@ export const PostPage = (props) => {
       id: 0,
       description: '',
       imgByte: ''
-    }]
+    }],
+    donationDetails: [],
+    volunteer: '',
+    numberOfVolunteers: 0
   });
   const [images, setImages] = useState([
     {
       url: "https://www.1stformationsblog.co.uk/wp-content/uploads/2020/09/Charity-Image.png"
     }
   ]);
+  const [update, setUpdate] = useState(false);
+  const [color, setColor] = useState('gray');
   useEffect(() => {
     axios.get("http://localhost:8080/post/get/" + queryParams.get('id')).then(res => {
+      console.log(res.data);
       setPost(res.data);
 
       let items = [];
-      res.data.images.map(image => items.push({url: 'data:image/jpeg;base64,' + image.imgByte}));
+      res.data.images.map(image => items.push({ url: 'data:image/jpeg;base64,' + image.imgByte }));
       setImages(items);
+      switch (res.data.volunteer) {
+        case 'ĐĂNG KÝ TÌNH NGUYỆN VIÊN': {
+          setColor('#2565AE');
+          break;
+        }
+        case 'CHỜ PHÊ DUYỆT TÌNH NGUYỆN VIÊN': {
+          setColor('#E84855');
+          break;
+        }         
+        case 'ĐÃ TRỞ THÀNH TÌNH NGUYỆN VIÊN': {
+          setColor('var(--third-color-green)');
+          break;
+        }  
+        default:
+          setColor('gray');     
+      }
     });
-  }, [])
+  }, [update]);
 
+  const handleRegister = () => {
+    switch (post.volunteer) {
+      case 'ĐĂNG KÝ TÌNH NGUYỆN VIÊN': {
+        axios.get("http://localhost:8080/volunteer/create/" + post.id).then(() => {
+          setUpdate(!update);
+        });
+        break;
+      }
+      case 'CHỜ PHÊ DUYỆT TÌNH NGUYỆN VIÊN': {
+        axios.delete("http://localhost:8080/volunteer/delete/" + post.id).then(() => {
+          setUpdate(!update);
+        });
+        break;
+      }
+      default:
+        break;     
+    }
+  }
   return (
     <div>
       <Header />
@@ -82,19 +120,18 @@ export const PostPage = (props) => {
           <h3>Tổng quan</h3>
           <div className="items">
             <div className="item">
-              <span>35</span>
+              <span>{post.donationDetails.length}</span>
               <p>Lượt Ủng Hộ</p>
             </div>
             <div className="item">
-              <span>{post.contribution.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")} VNĐ</span>
-              <p>Tổng tiền</p>
+              <span>{post.contribution.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")} / {post.expectation.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")} VNĐ</span>
+              <p>Đã quyên góp</p>
             </div>
             <div className="item">
-              <span>63</span>
+              <span>{post.numberOfVolunteers}</span>
               <p>Tình nguyện viên</p>
             </div>
           </div>
-
           <div className="funtion">
             <Link
               onClick={() => {
@@ -110,10 +147,11 @@ export const PostPage = (props) => {
                 window.scrollTo(0, 0);
               }}
               className="donate"
-              to="/donate"
+              to={"/donate?id=" + post.id}
             >
               Ủng hộ
             </Link>
+            {post.volunteer !== "CHƯA ĐĂNG NHẬP" && <button className="volunteer" style={{ 'backgroundColor': color }} onClick={handleRegister}>{post.volunteer}</button>}
           </div>
         </div>
 
@@ -141,7 +179,7 @@ export const PostPage = (props) => {
               }
             })}
             {post.content.map((paragraph, index) => {
-              if (index >= 4 && index < 10) {
+              if (index >= 4 && index < 8) {
                 return <p>{paragraph}</p>;
               }
             })}
@@ -161,7 +199,7 @@ export const PostPage = (props) => {
               }
             })}
             {post.content.map((paragraph, index) => {
-              if (index >= 10) {
+              if (index >= 8) {
                 return <p>{paragraph}</p>;
               }
             })}
@@ -195,16 +233,16 @@ export const PostPage = (props) => {
                   Xem tất cả
                 </Link>
               </div>
-              {RecentDonates.map((value, ind) => (
+              {post.donationDetails.map((donation, ind) => (
                 <div className="item" key={ind}>
                   <div className="avatar">
-                    <img src={value.avatar} alt="" />
+                    <img src={donation.isAnonymous ? "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcToZZjg_l0c8MyET9IcMmPBUYVP8PDKqBiT-OLHBVch7tk0GpEO0bxTgWfYJy3LGXLFDmI&usqp=CAU" : "https://letters.noticeable.io/" + donation.avatar} alt="" />
                   </div>
                   <div className="info">
-                    <div className="name">{value.name}</div>
-                    <div className="time">{value.time}</div>
+                    <div className="name">{donation.isAnonymous ? "Ẩn danh" : donation.fullname}</div>
+                    <div className="time">{new Date(donation.createAt).toLocaleDateString("vi", "VN")}</div>
                   </div>
-                  <div className="money">{value.money}</div>
+                  <div className="money">{donation.amount.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")} VNĐ</div>
                 </div>
               ))}
             </div>

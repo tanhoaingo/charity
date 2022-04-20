@@ -106,11 +106,8 @@
 }
 .edit-modal .create-post-page.dashboard {
   text-align: left;
-  z-index: 100000;
-  padding-top: 0 !important;
   overflow: scroll;
   margin-top: 40px;
-  padding: 100px;
 }
 
 .edit-modal.big .title {
