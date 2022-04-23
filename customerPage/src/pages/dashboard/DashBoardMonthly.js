@@ -37,6 +37,7 @@ import donateUserJson from "../../assets/JsonData/userDataMonthly.json";
 import { COLUMNS } from "../../assets/JsonData/ColumnUserMonthly";
 import { Filter } from "../analysic/Filter";
 import { DashBoardTopNav } from "./DashBoardTopNav";
+import axios from "axios";
 
 /**
  * @author
@@ -44,6 +45,7 @@ import { DashBoardTopNav } from "./DashBoardTopNav";
  **/
 
 export const DashBoardMonthly = (props) => {
+  const [supporter, setSupporter] = useState([]);
   const options = [
     { value: "", label: "Tất cả" },
     { value: "8", label: "Tháng 8" },
@@ -97,7 +99,7 @@ export const DashBoardMonthly = (props) => {
     setGlobalFilter(e.value);
   };
   const columns = useMemo(() => COLUMNS, []);
-  const data = useMemo(() => donateUserJson, []);
+  const data = useMemo(() => supporter, [supporter]);
   const tableInstance = useTable(
     {
       columns,
@@ -173,6 +175,13 @@ export const DashBoardMonthly = (props) => {
   const handleDeleteDate = () => {
     setDate("");
   };
+
+  useEffect(() =>{
+    axios.get("http://localhost:8080/statistic/get/supporters").then(res => {
+      console.log(res.data);
+      setSupporter(res.data)
+    })
+  },[]);
   return (
     <div>
       <div className="dashboard">
@@ -229,7 +238,7 @@ export const DashBoardMonthly = (props) => {
                               filter={globalFilter}
                               setFilter={setGlobalFilter}
                             />
-                            <div className="date-picker">
+                           {/*  <div className="date-picker">
                               <DatePicker
                                 date={date}
                                 onDateChange={setDate}
@@ -273,7 +282,7 @@ export const DashBoardMonthly = (props) => {
                               className="honghong type"
                               options={optionType}
                               onChange={handleType}
-                            />
+                            /> */}
                             {/* <button onClick={notify}>Notify!</button> */}
                             <ToastContainer
                               position="top-center"
@@ -298,7 +307,8 @@ export const DashBoardMonthly = (props) => {
                                 {headergroup.headers.map((column) => (
                                   <td
                                     {...column.getHeaderProps(
-                                      column.getSortByToggleProps()
+                                      //column.getSortByToggleProps(),
+                                      {style: {width: column.width}}
                                     )}
                                   >
                                     {column.render("Header")}

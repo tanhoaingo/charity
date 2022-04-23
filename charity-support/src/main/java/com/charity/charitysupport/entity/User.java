@@ -49,6 +49,7 @@ public class User implements UserDetails {
         private String role = "USER";
         private String avatar;
         private Integer point = 0;
+        private Integer times = 0;
 
         @OneToMany(mappedBy = "user")
         @JsonManagedReference

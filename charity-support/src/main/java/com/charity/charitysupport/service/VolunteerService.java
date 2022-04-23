@@ -61,4 +61,19 @@ public class VolunteerService {
         }
         return list;
     }
+
+    public void update(Long id, String status) {
+        Volunteer volunteer = volunteerRepository.findById(id).orElseThrow(() -> new RuntimeException("Can't find volunteer with id: " + id));
+        volunteer.setStatus(status);
+        if(status.equals("ĐÃ TRỞ THÀNH TÌNH NGUYỆN VIÊN")){
+            volunteer.getUser().setTimes(volunteer.getUser().getTimes() + 1);
+        }
+        volunteerRepository.save(volunteer);
+    }
+
+    public void evaluate(Long id, Integer point) {
+        Volunteer volunteer = volunteerRepository.findById(id).orElseThrow(() -> new RuntimeException("Can't find volunteer with id: " + id));
+        volunteer.getUser().setPoint(volunteer.getUser().getPoint() + point);
+        volunteerRepository.save(volunteer);
+    }
 }

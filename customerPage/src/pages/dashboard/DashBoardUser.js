@@ -37,6 +37,7 @@ import donateUserJson from "../../assets/JsonData/userDataTotal.json";
 import { COLUMNS } from "../../assets/JsonData/ColumnUserTotal";
 import { Filter } from "../../pages/analysic/Filter";
 import { DashBoardTopNav } from "./DashBoardTopNav";
+import axios from "axios";
 
 /**
  * @author
@@ -44,6 +45,8 @@ import { DashBoardTopNav } from "./DashBoardTopNav";
  **/
 
 export const DashBoardUser = (props) => {
+  const [donation, setDonation] = useState([]);
+
   const options = [
     { value: "", label: "Tất cả" },
     { value: "8", label: "Tháng 8" },
@@ -97,7 +100,7 @@ export const DashBoardUser = (props) => {
     setGlobalFilter(e.value);
   };
   const columns = useMemo(() => COLUMNS, []);
-  const data = useMemo(() => donateUserJson, []);
+  const data = useMemo(() => donation, [donation]);
   const tableInstance = useTable(
     {
       columns,
@@ -146,12 +149,10 @@ export const DashBoardUser = (props) => {
   const [date, setDate] = useState();
   useEffect(() => {
     var localDate = new Date(date);
-    var xx = localDate.toLocaleDateString("en-US");
+    var xx = localDate.toLocaleDateString("vi-VN");
     if (xx === "Invalid Date") {
       xx = "";
     }
-
-    console.log("binnnnnnnnnnnnn");
     console.log(xx);
     if (xx !== "") {
       var initial = xx.split(/\//);
@@ -160,19 +161,38 @@ export const DashBoardUser = (props) => {
         if (initial[0].length === 1) initial[0] = "0" + initial[0];
       }
 
-      xx = [initial[2], initial[1], initial[0]].join("-");
-      console.log(xx);
+      xx = [initial[0], initial[1], initial[2]].join("-");
       if (xx === "Invalid Date") {
         xx = "";
       }
     }
-
+    console.log(xx);
     setGlobalFilter(xx || "");
   }, [date]);
 
   const handleDeleteDate = () => {
     setDate("");
   };
+
+  useEffect(() => {
+    axios.get("http://localhost:8080/donation/get/all").then(res => {
+      console.log(res.data);
+      let data = res.data;
+      data.forEach(element => {
+          var localDate = new Date(element.createAt);
+    
+          localDate = localDate.toLocaleDateString("vi-VN");
+          var initial = localDate.split(/\//);
+          if (initial[1] && initial[0]) {
+            if (initial[1].length === 1) initial[1] = "0" + initial[1];
+            if (initial[0].length === 1) initial[0] = "0" + initial[0];
+          }
+          element.createAt = [initial[0], initial[1], initial[2]].join("-");
+        },
+      );
+      setDonation(res.data);
+    })
+  },[])
   return (
     <div>
       <div className="dashboard">
@@ -268,12 +288,12 @@ export const DashBoardUser = (props) => {
                               options={optionMethod}
                               onChange={handleMethod}
                             />
-                            <Select
+{/*                             <Select
                               placeholder="Chọn loại"
                               className="honghong type"
                               options={optionType}
                               onChange={handleType}
-                            />
+                            /> */}
                             {/* <button onClick={notify}>Notify!</button> */}
                             <ToastContainer
                               position="top-center"
@@ -296,9 +316,10 @@ export const DashBoardUser = (props) => {
                             {headerGroups.map((headergroup) => (
                               <tr {...headergroup.getHeaderGroupProps()}>
                                 {headergroup.headers.map((column) => (
-                                  <td
+                                  <td 
                                     {...column.getHeaderProps(
-                                      column.getSortByToggleProps()
+                                      //column.getSortByToggleProps(),
+                                      {style: {width: column.width}}
                                     )}
                                   >
                                     {column.render("Header")}

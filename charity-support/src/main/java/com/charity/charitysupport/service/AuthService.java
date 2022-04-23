@@ -78,7 +78,6 @@ public class AuthService {
         VerificationToken verificationToken = verificationRepository.findByToken(token)
                 .orElseThrow(() -> new RuntimeException("Invalid Token"));
         fetchUserAndEnable(verificationToken);
-        System.out.println(verificationToken.getId());
         verificationRepository.deleteById(verificationToken.getId());
     }
 

@@ -83,15 +83,16 @@
   display: flex;
   align-items: center;
   text-align: left;
+  justify-items: center;
+  height: 60%;
 }
-.edit-modal .body .right .session textarea {
+.edit-modal .body .right .session input {
   border: none;
   outline: none;
   border: 2px solid rgba(211, 211, 211, 0.384);
   border-radius: 10px;
   width: 210px;
   padding: 10px;
-  margin-top: 20px;
   font-size: 1.6rem;
 }
 .edit-modal .body .right button {

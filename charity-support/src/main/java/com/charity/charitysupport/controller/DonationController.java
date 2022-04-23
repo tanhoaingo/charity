@@ -1,10 +1,15 @@
 package com.charity.charitysupport.controller;
 
+import java.util.List;
+
+import com.charity.charitysupport.DTO.DonationDto;
 import com.charity.charitysupport.DTO.DonationRequest;
+import com.charity.charitysupport.DTO.UserStatistic;
 import com.charity.charitysupport.service.DonationService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,4 +29,10 @@ public class DonationController {
         donationService.create(donationRequest);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
+    @GetMapping("/get/all")
+    public ResponseEntity<List<DonationDto>> getAll(){
+        return ResponseEntity.status(HttpStatus.OK).body(donationService.getAll());
+    }
+
 }

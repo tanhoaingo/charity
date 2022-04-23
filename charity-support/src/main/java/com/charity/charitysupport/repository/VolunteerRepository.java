@@ -1,11 +1,11 @@
 package com.charity.charitysupport.repository;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
 import javax.transaction.Transactional;
 
+import com.charity.charitysupport.DTO.VolunteerRegistration;
 import com.charity.charitysupport.entity.Volunteer;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -29,4 +29,8 @@ public interface VolunteerRepository extends JpaRepository<Volunteer, Long> {
 
     @Query("SELECT count(v.user) FROM Volunteer as v group by v.user")
     Long getNumberOfVolunteer();
+
+    @Query(value = "select v.id as id, u.username as username, u.avatar as avatar, u.fullname as fullname, date_format(v.create_at, '%d/%m/%Y') as createAt, p.title as title, u.email as email, u.phone_number as phoneNumber, v.status as status from volunteer as v, user as u, post as p where v.user_id = u.id and v.post_id = p.id", nativeQuery = true)
+    List<VolunteerRegistration> getVolunteers();
+
 }

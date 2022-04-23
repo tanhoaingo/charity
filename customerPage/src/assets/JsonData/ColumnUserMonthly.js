@@ -2,63 +2,46 @@ import { format } from "date-fns";
 
 export const COLUMNS = [
   {
-    Header: "ID",
-    Footer: "username",
-    accessor: "id",
-  },
-  {
-    Header: "avatar",
-    Footer: "avatar",
-    accessor: "avatar",
-    Cell: (tableProps) => (
-      <img src={tableProps.row.original.avatar} width={60} alt="Player" />
-    ),
-  },
-  {
-    Header: "username",
+    Header: "Username",
     Footer: "username",
     accessor: "username",
   },
   {
-    Header: "money",
-    Footer: "money",
-    accessor: "money",
+    Header: "Ảnh đại diện",
+    Footer: "avatar",
+    accessor: "avatar",
+    width: 50,
+    Cell: (tableProps) => (
+      <img src={"https://letters.noticeable.io/" + tableProps.row.original.avatar} alt="Player" />
+    ),
   },
   {
-    Header: "method",
-    Footer: "method",
-    accessor: "method",
+    Header: "Họ và tên",
+    Footer: "Họ và tên",
+    accessor: "fullname",
   },
   {
-    Header: "Ngày",
-    Footer: "Ngày",
-    accessor: "date",
-    // Cell: (value) => {
-    //   return format(new Date(value.row.original.date, "dd/MM/yyyy"));
-    // },toLocaleDateString("en-US")
-
-    Cell: (tableProps) => {
-      var localDate = new Date(tableProps.row.original.date.toString());
-
-      localDate = localDate.toLocaleDateString("en-US");
-      var initial = localDate.split(/\//);
-      if (initial[1] && initial[0]) {
-        if (initial[1].length === 1) initial[1] = "0" + initial[1];
-        if (initial[0].length === 1) initial[0] = "0" + initial[0];
-      }
-      return [initial[1], initial[0], initial[2]].join("-");
-    },
+    Header: "Email",
+    Footer: "email",
+    accessor: "email",
   },
   {
-    Header: "Số lần",
-    Footer: "count",
-    accessor: "count",
+    Header: "Số điện thoại",
+    Footer: "Số điện thoại",
+    accessor: "phoneNumber",
   },
   {
     Header: "Tổng tiền",
     Footer: "total",
     accessor: "total",
+    Cell: (tableProps) => tableProps.row.original.total.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.") + " VNĐ"
   },
+  {
+    Header: "Số lần",
+    Footer: "count",
+    accessor: "times",
+  },
+
   // {
   //   Header: "type",
   //   Footer: "type",

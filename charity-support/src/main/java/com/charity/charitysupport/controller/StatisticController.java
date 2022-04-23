@@ -1,6 +1,11 @@
 package com.charity.charitysupport.controller;
 
+import java.util.List;
+
 import com.charity.charitysupport.DTO.StatisticDto;
+import com.charity.charitysupport.DTO.UserStatistic;
+import com.charity.charitysupport.DTO.VolunteerRegistration;
+import com.charity.charitysupport.DTO.VolunteerStatistic;
 import com.charity.charitysupport.service.StatisticService;
 
 import org.springframework.http.HttpStatus;
@@ -21,5 +26,20 @@ public class StatisticController {
     @GetMapping("/overview")
     public ResponseEntity<StatisticDto> getOverview(){
         return ResponseEntity.status(HttpStatus.OK).body(statisticService.getOverview());
+    }
+
+    @GetMapping("/get/supporters")
+    public ResponseEntity<List<UserStatistic>> getSupporters(){
+        return ResponseEntity.status(HttpStatus.OK).body(statisticService.getSupporters());
+    }
+
+    @GetMapping("/get/volunteers")
+    public ResponseEntity<List<VolunteerStatistic>> getVolunteers(){
+        return ResponseEntity.status(HttpStatus.OK).body(statisticService.getVolunteers());
+    }
+
+    @GetMapping("get/registration/volunteer")
+    public ResponseEntity<List<VolunteerRegistration>> getVolunteerRegistration(){
+        return ResponseEntity.status(HttpStatus.OK).body(statisticService.getVolunteerRegistration());
     }
 }

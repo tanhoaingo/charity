@@ -3,8 +3,11 @@ package com.charity.charitysupport.service;
 
 
 import java.util.Date;
+import java.util.List;
 
+import com.charity.charitysupport.DTO.DonationDto;
 import com.charity.charitysupport.DTO.DonationRequest;
+import com.charity.charitysupport.DTO.UserStatistic;
 import com.charity.charitysupport.entity.Donation;
 import com.charity.charitysupport.entity.Post;
 import com.charity.charitysupport.entity.User;
@@ -41,7 +44,18 @@ public class DonationService {
         donation.setPost(post);
         donation.setUser(user);
         donation.setCreateAt(new Date());
-        System.out.println(donationRequest.getIsAnonymous());
         donationRepository.save(donation);
+    }
+
+    public List<DonationDto> getAll(){
+        List<DonationDto> list = donationRepository.getAllDonation();
+        for (DonationDto donationDto : list) {
+            if(donationDto.getIsAnonymous()){
+                donationDto.setAvatar("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcToZZjg_l0c8MyET9IcMmPBUYVP8PDKqBiT-OLHBVch7tk0GpEO0bxTgWfYJy3LGXLFDmI&usqp=CAU");
+                donationDto.setFullname("Anonymous");
+                donationDto.setUsername("anonymous");
+            }
+        }
+        return list;
     }
 }

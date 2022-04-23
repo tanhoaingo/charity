@@ -39,7 +39,7 @@ export const DashBoardTab = (props) => {
               className={props.link === "user" ? "tab-item active" : "tab-item"}
             >
               <i class="fas fa-user-alt"></i>
-              Người đóng góp
+              Lượt ủng hộ
             </div>
           </Link>
           <Link to="/dashboard/chuongtrinh">
@@ -60,7 +60,7 @@ export const DashBoardTab = (props) => {
               }
             >
               <i class="fas fa-hand-holding-medical"></i>
-              Hàng tháng
+              Người ủng hộ
             </div>
           </Link>
 

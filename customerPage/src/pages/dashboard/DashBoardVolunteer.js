@@ -37,6 +37,7 @@ import donateUserJson from "../../assets/JsonData/userDataVolunteer.json";
 import { COLUMNS } from "../../assets/JsonData/ColumnUserVolunteer";
 import { Filter } from "../analysic/Filter";
 import { DashBoardTopNav } from "./DashBoardTopNav";
+import axios from "axios";
 
 /**
  * @author
@@ -44,6 +45,7 @@ import { DashBoardTopNav } from "./DashBoardTopNav";
  **/
 
 export const DashBoardVolunteer = (props) => {
+  const [volunteer, setVolunteer] = useState([]);
   const options = [
     { value: "", label: "Tất cả" },
     { value: "8", label: "Tháng 8" },
@@ -92,13 +94,13 @@ export const DashBoardVolunteer = (props) => {
 
   const handleMethod = (e) => {
     setMethod(e.value);
-    setGlobalFilter(e.value);
+    setGlobalFilter(e.value); 
   };
   const handleType = (e) => {
     setGlobalFilter(e.value);
   };
   const columns = useMemo(() => COLUMNS, []);
-  const data = useMemo(() => donateUserJson, []);
+  const data = useMemo(() => volunteer, [volunteer]);
   const tableInstance = useTable(
     {
       columns,
@@ -174,6 +176,12 @@ export const DashBoardVolunteer = (props) => {
   const handleDeleteDate = () => {
     setDate("");
   };
+
+  useEffect(() =>{
+    axios.get("http://localhost:8080/statistic/get/volunteers").then(res => {
+      setVolunteer(res.data);
+    })
+  },[]);
   return (
     <div>
       <div className="dashboard">
@@ -230,7 +238,7 @@ export const DashBoardVolunteer = (props) => {
                               filter={globalFilter}
                               setFilter={setGlobalFilter}
                             />
-                            <div className="date-picker">
+{/*                             <div className="date-picker">
                               <DatePicker
                                 date={date}
                                 onDateChange={setDate}
@@ -262,7 +270,7 @@ export const DashBoardVolunteer = (props) => {
                                 options={options2}
                                 onChange={handleYear}
                               />
-                            </div>
+                            </div> */}
 
                             <Select
                               placeholder="Chọn hạng"
@@ -294,7 +302,8 @@ export const DashBoardVolunteer = (props) => {
                                 {headergroup.headers.map((column) => (
                                   <td
                                     {...column.getHeaderProps(
-                                      column.getSortByToggleProps()
+                                      //column.getSortByToggleProps()
+                                      {style: {width: column.width}}
                                     )}
                                   >
                                     {column.render("Header")}

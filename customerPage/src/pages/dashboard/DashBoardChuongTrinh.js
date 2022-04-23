@@ -24,7 +24,7 @@ import post1Img from "../../assets/img/homePagePost/post1.jpg";
 // toast
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import { useSelector, useDispatch } from "react-redux";
 // json
 import {
   useTable,
@@ -33,17 +33,25 @@ import {
   usePagination,
   useFilters,
 } from "react-table";
-import donateUserJson from "../../assets/JsonData/PostJson.json";
+import donateUserJson from "../../assets/JsonData/PostAdminJson.json";
 import { COLUMNS } from "../../assets/JsonData/ColumnPost";
 import { Filter } from "../analysic/Filter";
 import { DashBoardTopNav } from "./DashBoardTopNav";
-
+import { getEntire } from '../../action/post'
 /**
  * @author
- * @function DashBoardChuongTrinh
+ * @function DashBoardChuongTrinhAdmin
  **/
 
 export const DashBoardChuongTrinh = (props) => {
+  const posts = useSelector(state => state.post.data);
+  const dispatch = useDispatch();
+
+  console.log(posts);  
+  useEffect(() => {
+    dispatch(getEntire());
+  }, [dispatch]);
+
   const options = [
     { value: "", label: "Tất cả" },
     { value: "8", label: "Tháng 8" },
@@ -116,7 +124,7 @@ export const DashBoardChuongTrinh = (props) => {
     setGlobalFilter(e.value);
   };
   const columns = useMemo(() => COLUMNS, []);
-  const data = useMemo(() => donateUserJson, []);
+  const data = useMemo(() => posts, [posts]); 
   const tableInstance = useTable(
     {
       columns,
@@ -151,7 +159,7 @@ export const DashBoardChuongTrinh = (props) => {
 
   // toast
   const notify = () =>
-    toast.success("Thành công !", {
+    toast.success("Xuất thành công!", {
       position: "top-right",
       autoClose: 2222,
       hideProgressBar: false,
@@ -196,7 +204,7 @@ export const DashBoardChuongTrinh = (props) => {
     <div>
       <div className="dashboard">
         <div className="dashboard__left">
-          <DashBoardTab link="chuongtrinh" />
+          <DashBoardTab link="postadmin" />
         </div>
         <div className="clear"></div>
         <div className="dashboard__body">
@@ -248,12 +256,6 @@ export const DashBoardChuongTrinh = (props) => {
                               setFilter={setGlobalFilter}
                             />
 
-                            <Select
-                              placeholder="Tổ chức"
-                              className="honghong method"
-                              options={optionMethod}
-                              onChange={handleMethod}
-                            />
                             <Select
                               placeholder="Loại từ thiện"
                               className="honghong type"

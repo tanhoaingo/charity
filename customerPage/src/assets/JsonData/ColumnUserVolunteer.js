@@ -4,69 +4,59 @@ export const COLUMNS = [
   {
     Header: "Hạng",
     Footer: "username",
-    accessor: "id",
+    accessor: "index",
     Cell: (tableProps) => (
-      <span className={tableProps.row.original.id < 4 ? "rank top" : "rank"}>
-        {tableProps.row.original.id}{" "}
+      <span className={tableProps.row.original.index < 4 ? "rank top" : "rank"}>
+        {tableProps.row.original.index}{" "}
       </span>
     ),
   },
   {
-    Header: "avatar",
+    Header: "Ảnh đại diện",
     Footer: "avatar",
     accessor: "avatar",
+    width: 50,
     Cell: (tableProps) => (
-      <img src={tableProps.row.original.avatar} width={60} alt="Player" />
+      <img src={"https://letters.noticeable.io/" + tableProps.row.original.avatar} width={60} alt="Player" />
     ),
   },
   {
-    Header: "username",
+    Header: "Username",
     Footer: "username",
     accessor: "username",
   },
   {
-    Header: "Ngày tham gia",
-    Footer: "Ngày",
-    accessor: "date",
+    Header: "Họ và tên",
+    Footer: "Họ và tên",
+    accessor: "fullname",
     // Cell: (value) => {
     //   return format(new Date(value.row.original.date, "dd/MM/yyyy"));
     // },toLocaleDateString("en-US")
 
-    Cell: (tableProps) => {
-      var localDate = new Date(tableProps.row.original.date.toString());
-
-      localDate = localDate.toLocaleDateString("en-US");
-      var initial = localDate.split(/\//);
-      if (initial[1] && initial[0]) {
-        if (initial[1].length === 1) initial[1] = "0" + initial[1];
-        if (initial[0].length === 1) initial[0] = "0" + initial[0];
-      }
-      return [initial[1], initial[0], initial[2]].join("-");
-    },
   },
   {
-    Header: "Chương trình",
-    Footer: "duan",
-    accessor: "duan",
+    Header: "Email",
+    Footer: "email",
+    accessor: "email",
   },
   {
-    Header: "Số tháng",
-    Footer: "count",
-    accessor: "count",
+    Header: "Số lần",
+    Footer: "Số lần",
+    accessor: "times",
   },
   {
-    Header: "Hạng",
-    Footer: "hang",
-    accessor: "hang",
+    Header: "Danh hiệu",
+    Footer: "Danh hiệu",
+    accessor: "rank",
     Cell: (tableProps) => (
-      <span className={"hang " + tableProps.row.original.hang}>
-        {tableProps.row.original.hang === "kimcuong"
+      <span className={"hang " + tableProps.row.original.rank}>
+        {tableProps.row.original.rank === "kimcuong"
           ? "Kim cương"
-          : tableProps.row.original.hang === "hangvang"
+          : tableProps.row.original.rank === "hangvang"
           ? "Vàng"
-          : tableProps.row.original.hang === "hangbac"
+          : tableProps.row.original.rank === "hangbac"
           ? "Bạc"
-          : tableProps.row.original.hang === "hangdong"
+          : tableProps.row.original.rank === "hangdong"
           ? "Đồng"
           : ""}
       </span>
@@ -74,8 +64,9 @@ export const COLUMNS = [
   },
   {
     Header: "Tổng điểm",
-    Footer: "diem",
-    accessor: "diem",
+    Footer: "Tổng điểm",
+    accessor: "point",
+    Cell: (tableProps) => tableProps.row.original.point.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")
   },
   // {
   //   Header: "type",

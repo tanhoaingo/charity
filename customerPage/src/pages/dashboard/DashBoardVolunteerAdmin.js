@@ -37,6 +37,7 @@ import donateUserJson from "../../assets/JsonData/userAdminData.json";
 import { COLUMNS } from "../../assets/JsonData/ColumnUserAdmin";
 import { Filter } from "../analysic/Filter";
 import { DashBoardTopNav } from "./DashBoardTopNav";
+import axios from "axios";
 
 /**
  * @author
@@ -44,6 +45,7 @@ import { DashBoardTopNav } from "./DashBoardTopNav";
  **/
 
 export const DashBoardVolunteerAdmin = (props) => {
+  const [volunteer, setVolunteer] = useState([]);
   const options = [
     { value: "", label: "Tất cả" },
     { value: "8", label: "Tháng 8" },
@@ -98,14 +100,13 @@ export const DashBoardVolunteerAdmin = (props) => {
     setGlobalFilter(e.value);
   };
   const columns = useMemo(() => COLUMNS, []);
-  const data = useMemo(() => donateUserJson, []);
+  const data = useMemo(() => volunteer, [volunteer]);
   const tableInstance = useTable(
     {
       columns,
 
       data,
     },
-
     useGlobalFilter,
     useFilters,
     useSortBy,
@@ -174,6 +175,12 @@ export const DashBoardVolunteerAdmin = (props) => {
   const handleDeleteDate = () => {
     setDate("");
   };
+
+  useEffect(() =>{
+    axios.get("http://localhost:8080/statistic/get/registration/volunteer").then(res => {
+      setVolunteer(res.data);
+    })
+  },[]);
   return (
     <div>
       <div className="dashboard">
@@ -294,7 +301,8 @@ export const DashBoardVolunteerAdmin = (props) => {
                                 {headergroup.headers.map((column) => (
                                   <td
                                     {...column.getHeaderProps(
-                                      column.getSortByToggleProps()
+                                      //column.getSortByToggleProps()
+                                      {style: {width: column.width}}
                                     )}
                                   >
                                     {column.render("Header")}

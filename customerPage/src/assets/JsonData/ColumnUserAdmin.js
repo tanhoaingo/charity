@@ -1,4 +1,4 @@
-import { format } from "date-fns";
+import { format, set } from "date-fns";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import "./tablegeneral.css";
@@ -7,60 +7,43 @@ import Select from "react-select";
 // toast
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
 
 export const COLUMNS = [
   {
-    Header: "Hạng",
-    Footer: "username",
-    accessor: "id",
-  },
-  {
-    Header: "avatar",
-    Footer: "avatar",
-    accessor: "avatar",
-    Cell: (tableProps) => (
-      <img src={tableProps.row.original.avatar} width={60} alt="Player" />
-    ),
-  },
-  {
-    Header: "username",
+    Header: "Username",
     Footer: "username",
     accessor: "username",
   },
   {
+    Header: "Ảnh đại diện",
+    Footer: "avatar",
+    accessor: "avatar",
+    width: 50,
+    Cell: (tableProps) => (
+      <img src={"https://letters.noticeable.io/" + tableProps.row.original.avatar} width={60} alt="Player" />
+    ),
+  },
+  {
+    Header: "Họ và tên",
+    Footer: "Họ và tên",
+    accessor: "fullname",
+    width: 90
+  },
+  {
     Header: "Ngày đăng ký",
     Footer: "Ngày",
-    accessor: "date",
+    accessor: "createAt",
+    width: 50
     // Cell: (value) => {
     //   return format(new Date(value.row.original.date, "dd/MM/yyyy"));
     // },toLocaleDateString("en-US")
-
-    Cell: (tableProps) => {
-      var localDate = new Date(tableProps.row.original.date.toString());
-
-      localDate = localDate.toLocaleDateString("en-US");
-      var initial = localDate.split(/\//);
-      if (initial[1] && initial[0]) {
-        if (initial[1].length === 1) initial[1] = "0" + initial[1];
-        if (initial[0].length === 1) initial[0] = "0" + initial[0];
-      }
-      return [initial[1], initial[0], initial[2]].join("-");
-    },
-  },
-  {
-    Header: "Chương trình",
-    Footer: "duan",
-    accessor: "duan",
-  },
-  {
-    Header: "Số điện thoại",
-    Footer: "sdt",
-    accessor: "sdt",
   },
   {
     Header: "Email",
     Footer: "email",
     accessor: "email",
+    width: 80
     // Cell: (tableProps) => (
     //   <span className={"hang " + tableProps.row.original.hang}>
     //     {tableProps.row.original.hang === "kimcuong"
@@ -76,11 +59,25 @@ export const COLUMNS = [
     // ),
   },
   {
+    Header: "Số điện thoại",
+    Footer: "Số điện thoại",
+    accessor: "phoneNumber",
+  },
+  {
+    Header: "Chương trình",
+    Footer: "Chương trình",
+    accessor: "title",
+    width: 110
+  },
+  {
     Header: "",
     Footer: "status",
     accessor: "status",
+    width: 110,
     Cell: (tableProps) => {
+      const [point, setPoint] = useState(0);
       const [openModal, setOpenModal] = useState(false);
+      const [reload, setReload] = useState(false);
       const optionMonth = [
         { value: 1, label: "Tháng 7" },
         { value: 20, label: "Tháng 8" },
@@ -146,16 +143,31 @@ export const COLUMNS = [
 
       return (
         <span>
-          {tableProps.row.original.status === "notreview" ? (
+          {tableProps.row.original.status === "CHỜ PHÊ DUYỆT TÌNH NGUYỆN VIÊN" ? (
             <span className="adminduyet">
-              <i onClick={notify1} class="btn-see accept fas fa-vote-yea"></i>
-
-              <i onClick={notify2} class="btn-see remove fas fa-trash-alt"></i>
+              <i onClick={() => {
+                axios.put("http://localhost:8080/volunteer/update/" + tableProps.row.original.id, "ĐÃ TRỞ THÀNH TÌNH NGUYỆN VIÊN").then(() => {
+                  tableProps.row.original.status = "ĐÃ TRỞ THÀNH TÌNH NGUYỆN VIÊN";
+                  setReload(!reload);
+                }
+                );
+                notify1();
+              }}
+                class="btn-see accept fas fa-vote-yea"></i>
+              <i onClick={() => {
+                axios.put("http://localhost:8080/volunteer/update/" + tableProps.row.original.id, "ĐÃ BỊ TỪ CHỐI").then(() => {
+                  tableProps.row.original.status = "ĐÃ BỊ TỪ CHỐI";
+                  setReload(!reload);
+                }
+                );
+                notify2();
+              }} class="btn-see remove fas fa-trash-alt"></i>
             </span>
-          ) : tableProps.row.original.status === "accept" ? (
+          ) : tableProps.row.original.status === "ĐÃ TRỞ THÀNH TÌNH NGUYỆN VIÊN" ? (
             <div
               className="adminduyet-open-modal"
               onClick={() => {
+                setPoint(0);
                 setOpenModal(true);
               }}
             >
@@ -164,9 +176,6 @@ export const COLUMNS = [
           ) : (
             <div
               className="adminduyet-open-modal delete"
-              onClick={() => {
-                setOpenModal(true);
-              }}
             >
               đã xóa
             </div>
@@ -196,7 +205,7 @@ export const COLUMNS = [
                   <img src={charityImg} alt="" />
                 </div>
                 <div className="right">
-                  <div className="session">
+                  {/*                   <div className="session">
                     <h5 className="title">Chọn tháng</h5>
                     <Select
                       placeholder=""
@@ -212,12 +221,21 @@ export const COLUMNS = [
                       className="honghong year"
                       options={optionScore}
                     />
-                  </div>
-                  <div className="session">
-                    <h5 className="title">Nhận xét</h5>
-                    <textarea name="" id="" cols="30" rows="3"></textarea>
-                  </div>
-                  <button onClick={notify}>Hoàn tất</button>
+                  </div> */}
+                  <form onSubmit={(e) =>{
+                    e.preventDefault();
+                    axios.put(`http://localhost:8080/volunteer/evaluate/${tableProps.row.original.id}/${point}`);
+                    notify();
+                  }}>
+                    <div className="session">
+                      <h5 className="title">Cho điểm</h5>
+                      <input name="point" id="" type="number" value={point} onChange={(e) => {
+                        setPoint(e.target.value);
+                      }}></input>
+                    </div>
+                    <button type="submit"
+                    >Hoàn tất</button>
+                  </form>
                 </div>
               </div>
             </div>

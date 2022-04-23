@@ -3,6 +3,7 @@ package com.charity.charitysupport.repository;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.charity.charitysupport.DTO.DonationDto;
 import com.charity.charitysupport.DTO.IContributionStatistic;
 import com.charity.charitysupport.DTO.SupporterDto;
 import com.charity.charitysupport.entity.Donation;
@@ -25,4 +26,7 @@ public interface DonationRepository extends JpaRepository<Donation, Long> {
 
     @Query(value = "select date_format(create_at, '%d/%m/%Y') as createAt, sum(amount) as total, count(*) as times from donation where month(create_at) = month(current_date()) group by date_format(create_at, '%d/%m/%Y') order by date_format(create_at, '%d/%m/%Y')", nativeQuery = true)
     List<IContributionStatistic> getContributionStatistics();
+
+    @Query(value = "select new com.charity.charitysupport.DTO.DonationDto(d.user.username, d.user.fullname, d.user.avatar, d.amount, d.paymentMethod, d.createAt, d.post.title, d.isAnonymous) from Donation as d order by d.createAt desc")
+    List<DonationDto> getAllDonation();
 }
