@@ -148,12 +148,11 @@ export const DashBoardVolunteerAdmin = (props) => {
   const [date, setDate] = useState();
   useEffect(() => {
     var localDate = new Date(date);
-    var xx = localDate.toLocaleDateString("en-US");
+    var xx = localDate.toLocaleDateString("vi-VN");
     if (xx === "Invalid Date") {
       xx = "";
     }
 
-    console.log("binnnnnnnnnnnnn");
     console.log(xx);
     if (xx !== "") {
       var initial = xx.split(/\//);
@@ -162,7 +161,7 @@ export const DashBoardVolunteerAdmin = (props) => {
         if (initial[0].length === 1) initial[0] = "0" + initial[0];
       }
 
-      xx = [initial[2], initial[1], initial[0]].join("-");
+      xx = [initial[0], initial[1], initial[2]].join("/");
       console.log(xx);
       if (xx === "Invalid Date") {
         xx = "";
@@ -271,12 +270,12 @@ export const DashBoardVolunteerAdmin = (props) => {
                               />
                             </div>
 
-                            <Select
+{/*                             <Select
                               placeholder="Chọn hạng"
                               className="honghong type"
                               options={optionType}
                               onChange={handleType}
-                            />
+                            /> */}
                             {/* <button onClick={notify}>Notify!</button> */}
                             <ToastContainer
                               position="top-center"

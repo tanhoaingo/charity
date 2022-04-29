@@ -20,4 +20,5 @@ public interface UserRepository extends JpaRepository<User, Long>{
 
     @Query("select new com.charity.charitysupport.DTO.VolunteerStatistic(0 ,u.username, u.fullname, u.avatar, u.email, u.times, u.point, u.username) from User as u where u.volunteers.size > 0 order by u.point desc")
     List<VolunteerStatistic> getVolunteerStatistics();
+
 }

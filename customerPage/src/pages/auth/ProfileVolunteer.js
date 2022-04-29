@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Header } from "../../components/header/Header";
 import "./profile.css";
 // toast
@@ -7,12 +7,34 @@ import "react-toastify/dist/ReactToastify.css";
 
 import { ProfileTab } from "./ProfileTab";
 import { Link } from "react-router-dom";
+import axios from "axios";
 /**
  * @author
  * @function ProfileVolunteer
  **/
 
 export const ProfileVolunteer = (props) => {
+  const [volunteers, setVolunteers] = useState([]);
+  const [profile, setProfile] = useState({
+    username: '',
+    fullname: '',
+    avatar: ''
+  });
+  function chooseColor(status){
+    switch (status) {
+      case 'ĐĂNG KÝ TÌNH NGUYỆN VIÊN': {
+        return '#2565AE';
+      }
+      case 'CHỜ PHÊ DUYỆT TÌNH NGUYỆN VIÊN': {
+         return '#E84855'
+      }         
+      case 'ĐÃ TRỞ THÀNH TÌNH NGUYỆN VIÊN': {
+        return 'var(--third-color-green)';
+      }  
+      default:
+        return '#4D4D4D';  
+    }
+  }
   // toast
   // toast
   const notify = () => {
@@ -40,44 +62,61 @@ export const ProfileVolunteer = (props) => {
     }
   };
 
+  useEffect(() => {
+    axios.get("http://localhost:8080/auth/profile").then(res => {
+      if (res.status == 204) {
+        window.location.href = "/login";
+      } else if (res.status == 200) {
+        setProfile({
+          username: res.data.username,
+          fullname: res.data.fullname,
+          avatar: res.data.avatar
+        });
+        axios.get("http://localhost:8080/volunteer/find/volunteersOfUser").then(res => {
+          console.log(res.data);
+          setVolunteers(res.data);
+        })
+      }
+    });
+  }, []);
+
   return (
     <div>
       <Header />
       <div className="profile-page">
         <div className="profile-tab">
-          <ProfileTab tab="volunteer" />
+          <ProfileTab tab="volunteer" fullname={profile.fullname} avatar={profile.avatar} />
         </div>
         <div className="content">
           {" "}
           <h1 className="title">Đăng kí tình nguyện viên</h1>
-          <div className="chuongtrinh">
-            <img
-              className="img-chuongtrinh"
-              src="https://file1.dangcongsan.vn/data/0/images/2021/09/14/phammai/tinh-hinh-dich-benh.jpg?dpi=150&quality=100&w=780"
-              alt=""
-            />
-            <div className="name-chuongtrinh">
-              <p>Chương trình hỗ trợ người nghèo trong dịch Covid</p>
-              <span className="desc">
-                Trong điều kiện giãn cách xã hội phòng, chống Covid-19 tại Thành
-                phố Hồ Chí Minh kể từ trung tuần tháng 5/2021 đến nay; trước
-                những khó khăn của CBCN
-              </span>
-              <span className="onwer">
-                {" "}
-                <i class="fas fa-check-circle"></i>Hội Chống dịch Covid Nha
-                Trang
-              </span>
-            </div>
-
-            <div className="col3">
-              <p>Đang chờ xem xét ...</p>
+          {volunteers.map(volunteer =>
+            <div className="chuongtrinh">
               <img
-                src="https://www.pngarts.com/files/7/Remote-Work-PNG-Image-Transparent.png"
+                className="img-chuongtrinh"
+                src={'data:image/jpeg;base64,' + volunteer.img}
                 alt=""
               />
-            </div>
-          </div>
+              <div className="name-chuongtrinh">
+                <p>{volunteer.title}</p>
+{/*                 <span className="desc">
+                  Trong điều kiện giãn cách xã hội phòng, chống Covid-19 tại Thành
+                  phố Hồ Chí Minh kể từ trung tuần tháng 5/2021 đến nay; trước
+                  những khó khăn của CBCN
+                </span> */}
+                <span className="onwer">
+                  {" "}
+                  <i class="fas fa-check-circle"></i>{volunteer.organization }
+                </span>
+              </div>
+              <div className="col3">
+                <p style={{'color' : chooseColor(volunteer.status), 'marginLeft': '10px'}}>{volunteer.status}</p>
+{/*                 <img
+                  src="https://cdn-icons-png.flaticon.com/512/1786/1786640.png"
+                  alt=""
+                /> */}
+              </div>
+            </div>)}
         </div>
       </div>
     </div>

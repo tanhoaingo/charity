@@ -228,7 +228,7 @@ export const PostPage = (props) => {
                   onClick={() => {
                     window.scrollTo(0, 0);
                   }}
-                  to="/user"
+                  to={"/user?id=" + queryParams.get('id')}
                 >
                   Xem tất cả
                 </Link>

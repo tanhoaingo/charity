@@ -30,6 +30,9 @@ public interface VolunteerRepository extends JpaRepository<Volunteer, Long> {
     @Query("SELECT count(v.user) FROM Volunteer as v group by v.user")
     Long getNumberOfVolunteer();
 
+    @Query("SELECT count(v.user) FROM Volunteer as v where v.post.id = ?1 group by v.user")
+    Long getNumberOfVolunteerByPostId(Long id);
+    
     @Query(value = "select v.id as id, u.username as username, u.avatar as avatar, u.fullname as fullname, date_format(v.create_at, '%d/%m/%Y') as createAt, p.title as title, u.email as email, u.phone_number as phoneNumber, v.status as status from volunteer as v, user as u, post as p where v.user_id = u.id and v.post_id = p.id", nativeQuery = true)
     List<VolunteerRegistration> getVolunteers();
 

@@ -2,6 +2,7 @@ package com.charity.charitysupport.service;
 
 import java.util.List;
 
+import com.charity.charitysupport.DTO.HomeData;
 import com.charity.charitysupport.DTO.StatisticDto;
 import com.charity.charitysupport.DTO.UserStatistic;
 import com.charity.charitysupport.DTO.VolunteerRegistration;
@@ -24,6 +25,10 @@ public class StatisticService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
 
+    public HomeData getHomeData(){
+        return new HomeData(postRepository.findAll().size(), donationRepository.getNumberOfSupporter(), donationRepository.getSumOfAmount());
+    }
+
     public StatisticDto getOverview() {
         return StatisticDto.builder().sumOfAmount(donationRepository.getSumOfAmount())
                 .numberOfSupporter(donationRepository.getNumberOfSupporter())
@@ -31,6 +36,14 @@ public class StatisticService {
                 .supporters(donationRepository.getSupporters())
                 .contributionStatistics(donationRepository.getContributionStatistics())
                 .organizations(postRepository.getOrganization()).build();
+    } 
+    public StatisticDto getOverviewByPostId(Long id) {
+        return StatisticDto.builder().sumOfAmount(donationRepository.getSumOfAmountByPostId(id))
+                .numberOfSupporter(donationRepository.getNumberOfSupporterByPostId(id))
+                .numberOfVolunteer(volunteerRepository.getNumberOfVolunteerByPostId(id))
+                .supporters(null)
+                .contributionStatistics(donationRepository.getContributionStatisticsByPostId(id))
+                .organizations(null).build();
     }
 
     public List<UserStatistic> getSupporters() {

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Header } from "../../components/header/Header";
 import "./profile.css";
 // toast
@@ -14,6 +14,12 @@ import axios from "axios";
  **/
 
 export const ProfileDonate = (props) => {
+  const [donations, setDonations] = useState([]);
+  const [profile, setProfile] = useState({
+    username: '',
+    fullname: '',
+    avatar: ''
+  });
   // toast
   // toast
   const notify = () => {
@@ -40,39 +46,56 @@ export const ProfileDonate = (props) => {
       });
     }
   };
+  useEffect(() => {
+    axios.get("http://localhost:8080/auth/profile").then(res => {
+      if (res.status == 204) {
+        window.location.href = "/login";
+      } else if (res.status == 200) {
+        setProfile({
+          username: res.data.username,
+          fullname: res.data.fullname,
+          avatar: res.data.avatar
+        });
+        axios.get("http://localhost:8080/user/donations").then(res => {
+          setDonations(res.data);
+        })
+      }
+    });
+  }, []);
 
   return (
     <div>
       <Header />
       <div className="profile-page">
         <div className="profile-tab">
-          <ProfileTab tab="donate" />
+          <ProfileTab tab="donate" fullname={profile.fullname} avatar={profile.avatar} />
         </div>
         <div className="content">
           {" "}
           <h1 className="title">Chương trình đã đóng góp</h1>
-          <div className="chuongtrinh">
-            <img
-              src="http://canhbuom.edu.vn/wp-content/uploads/2013/03/tre-em-mu-cang-chai-voi-nhung-nu-cuoi-toa-nang-hon-nhien.jpg"
-              alt=""
-            />
-            <div className="name-chuongtrinh">
-              <p>Ủng hộ các em nhỏ miền Tây</p>
-              <span className="desc">
-                Cùng chung tay hỗ trợ xây dựng tủ sách cho hơn 20 điểm trường
-                thuộc vùng núi khó khăn của tỉnh Quảng Trị,
-              </span>
-              <span className="onwer">
-                {" "}
-                <i class="fas fa-check-circle"></i>Hội Trẻ Em Việt Nam
-              </span>
-            </div>
+          {donations.map(donation =>
+            <div className="chuongtrinh">
+              <img
+                src={'data:image/jpeg;base64,' + donation.img}
+                alt=""
+              />
+              <div className="name-chuongtrinh">
+                <p>{donation.title}</p>
+{/*                 <span className="desc">
+                  Cùng chung tay hỗ trợ xây dựng tủ sách cho hơn 20 điểm trường
+                  thuộc vùng núi khó khăn của tỉnh Quảng Trị,
+                </span> */}
+                <span className="onwer">
+                  {" "}
+                  <i class="fas fa-check-circle"></i>{donation.organization}
+                </span>
+              </div>
 
-            <div className="col3">
-              <p className="price">Số tiền: 700.000 VNĐ</p>
-              <Link to="/post">Xem chi tiết chương trình</Link>
-            </div>
-          </div>
+              <div className="col3">
+                <p className="price">Số tiền: {donation.amount.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")} VNĐ</p>
+                <Link to={"/post?id=" + donation.postId}>Xem chi tiết chương trình</Link>
+              </div>
+            </div>)}
         </div>
       </div>
     </div>

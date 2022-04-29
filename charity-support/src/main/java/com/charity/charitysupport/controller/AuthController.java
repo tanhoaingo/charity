@@ -5,8 +5,6 @@ import com.charity.charitysupport.DTO.LoginRequest;
 import com.charity.charitysupport.DTO.Profile;
 import com.charity.charitysupport.DTO.RefreshTokenRequest;
 import com.charity.charitysupport.DTO.RegisterRequest;
-import com.charity.charitysupport.entity.Volunteer;
-import com.charity.charitysupport.repository.VolunteerRepository;
 import com.charity.charitysupport.service.AuthService;
 import com.charity.charitysupport.service.RefreshTokenService;
 

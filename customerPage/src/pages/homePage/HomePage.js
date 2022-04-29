@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Header } from "../../components/header/Header";
 import "./homepage.css";
@@ -29,6 +29,7 @@ import { Footer } from "../../components/footer/Footer";
 import Topnav from "../../components/topnav/TopNav";
 import { useDispatch, useSelector } from 'react-redux';
 import { getAll } from '../../action/post';
+import axios from "axios";
 /**
  * @author
  * @function HomePage
@@ -37,9 +38,15 @@ import { getAll } from '../../action/post';
 export const HomePage = (props) => {
   const dispatch = useDispatch();
   const posts = useSelector(state => state.post.data);
-
+  const [data, setData] = useState({
+    posts: 0,
+    supporters: 0,
+    amount: 0
+  });
+  const newest = posts[posts.length-1];
   useEffect(() => {
     dispatch(getAll());
+    axios.get("http://localhost:8080/statistic/home/data").then(res => setData(res.data));
   }, [dispatch]);
 
   const ref = useRef();
@@ -96,7 +103,7 @@ export const HomePage = (props) => {
                   Ủng hộ ngay
                   <i class="fas fa-caret-right"></i>
                 </Link>
-              </div>
+              </div> 
               <Link to="dashboard">
                 <div className="left-pannel__bottom">
                   <div className="each-item">
@@ -104,8 +111,8 @@ export const HomePage = (props) => {
                       <img src={donateImg} alt="" />
                     </div>
                     <div className="info">
-                      <div className="quantity">380</div>
-                      <div className="desc">Chương trình hoàn thành</div>
+                      <div className="quantity">{data.posts}</div>
+                      <div className="desc">Chương trình</div>
                     </div>
                   </div>
 
@@ -114,7 +121,7 @@ export const HomePage = (props) => {
                       <img src={collectImg} alt="" />
                     </div>
                     <div className="info">
-                      <div className="quantity">380</div>
+                      <div className="quantity">{data.amount.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")} VNĐ</div>
                       <div className="desc">Tổng số tiền</div>
                     </div>
                   </div>
@@ -133,7 +140,7 @@ export const HomePage = (props) => {
                 <div className="card">
                   <div className="card-content">
                     <div className="card__title">Số người ủng hộ</div>
-                    <div className="card__quantity">4.323</div>
+                    <div className="card__quantity">{data.supporters}</div>
                     <div className="card__user">
                       <div className="user-item quantity">
                         <div className="quantity">4.5k</div>
@@ -171,15 +178,14 @@ export const HomePage = (props) => {
           <div className="post">
             <div className="post-left">
               <div className="image">
-                <img src={post1Img} alt="" />
+                <img src={'data:image/jpeg;base64,' + newest?.image} alt="" />
               </div>
             </div>
             <div className="post-right">
               <h3>
-                Chương trình quà cho người lao động khu vực Sài Gòn và các tỉnh
-                bị giãn cách
+                {newest?.title}
               </h3>
-              <p className="desc">
+{/*               <p className="desc">
                 Trước tình hình dịch bệnh vẫn diễn biến phức tạp, đời sống bà
                 con sẽ còn khó khăn trong thời gian dài. Chúng tôi tiếp tục mở
                 thành Chương trình 20,000 phần quà để hỗ trợ cho cả Hồ Chí Minh
@@ -187,16 +193,16 @@ export const HomePage = (props) => {
                 tiếp cận được.
                 <br />
                 Hi vọng sẽ nhận được tình yêu thương từ quý vị
-              </p>
+              </p> */}
               <Link
-                to="/donate"
+                to={"/donate?id=" + newest?.id}
                 onClick={handleDonateBtn}
                 className="btn btn-donate zoom-anim"
               >
                 Ủng hộ
               </Link>
               <Link
-                to="/post"
+                to={"/post?id=" + newest?.id} 
                 className="btn btn-detail zoom-anim"
                 onClick={() => window.scrollTo(0, 0)}
               >

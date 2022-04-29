@@ -4,12 +4,12 @@ import java.util.List;
 
 import com.charity.charitysupport.DTO.DonationDto;
 import com.charity.charitysupport.DTO.DonationRequest;
-import com.charity.charitysupport.DTO.UserStatistic;
 import com.charity.charitysupport.service.DonationService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,4 +35,9 @@ public class DonationController {
         return ResponseEntity.status(HttpStatus.OK).body(donationService.getAll());
     }
 
+    @GetMapping("/get/{postId}")
+    public ResponseEntity<List<DonationDto>> getByPostId(@PathVariable Long postId){
+        return ResponseEntity.status(HttpStatus.OK).body(donationService.getByPostId(postId));
+    }
+    
 }

@@ -3,6 +3,7 @@ package com.charity.charitysupport.controller;
 import java.util.List;
 
 import com.charity.charitysupport.DTO.VolunteerDto;
+import com.charity.charitysupport.service.AuthService;
 import com.charity.charitysupport.service.VolunteerService;
 
 import org.springframework.http.HttpStatus;
@@ -24,7 +25,6 @@ public class VolunteerController {
     
     private final VolunteerService volunteerService;
 
-
     @GetMapping("/create/{postId}")
     public ResponseEntity<Void> create(@PathVariable Long postId){
         volunteerService.create(postId);
@@ -37,7 +37,7 @@ public class VolunteerController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @GetMapping("/get/current-user")
+    @GetMapping("/find/volunteersOfUser")
     public ResponseEntity<List<VolunteerDto>> getVolunteersOfUser(){
         return ResponseEntity.status(HttpStatus.OK).body(volunteerService.getVolunteersOfUser());
     }

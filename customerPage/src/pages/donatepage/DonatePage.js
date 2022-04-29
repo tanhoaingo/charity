@@ -84,17 +84,23 @@ export const DonatePage = (props) => {
     }
   }
   useEffect(() => {
-    setDonation({
-      ...donation,
-      postId: queryParams.get('id')
+    axios.get("http://localhost:8080/auth/isLoggin").then(res =>{
+      if(res.data){
+        setDonation({
+          ...donation,
+          postId: queryParams.get('id')
+        })
+        axios.get("http://localhost:8080/post/get/" + queryParams.get('id')).then(res => {
+          setPost(res.data);
+    
+          let items = [];
+          res.data.images.map(image => items.push({ url: 'data:image/jpeg;base64,' + image.imgByte }));
+          setImages(items);
+        });
+      } else{
+        window.location.href = "/login";
+      }
     })
-    axios.get("http://localhost:8080/post/get/" + queryParams.get('id')).then(res => {
-      setPost(res.data);
-
-      let items = [];
-      res.data.images.map(image => items.push({ url: 'data:image/jpeg;base64,' + image.imgByte }));
-      setImages(items);
-    });
   }, []);
   const incognitoToggle = useRef(null);
   const handleToggleIncognito = () => {

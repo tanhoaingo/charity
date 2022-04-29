@@ -15,25 +15,27 @@ import axios from "axios";
 export const Volunteer = (props) => {
   const [volunteers, setVolunteers] = useState([]);
   useEffect(() => {
-    axios.get("http://localhost:8080/volunteer/get/current-user").then(res => {
-      console.log(res.data);
-      setVolunteers(res.data);
+    axios.get("http://localhost:8080/volunteer/find/volunteersOfUser").then(res => {
+      if (res.data !== undefined) {
+        console.log(res.data);
+        setVolunteers(res.data);
+      }
     })
-  }, [])
+  }, []);
 
-  function chooseColor(status){
+  function chooseColor(status) {
     switch (status) {
       case 'ĐĂNG KÝ TÌNH NGUYỆN VIÊN': {
         return '#2565AE';
       }
       case 'CHỜ PHÊ DUYỆT TÌNH NGUYỆN VIÊN': {
-         return '#E84855'
-      }         
+        return '#E84855'
+      }
       case 'ĐÃ TRỞ THÀNH TÌNH NGUYỆN VIÊN': {
         return 'var(--third-color-green)';
-      }  
+      }
       default:
-        return '#4D4D4D';  
+        return '#4D4D4D';
     }
   }
   return (
@@ -93,7 +95,7 @@ export const Volunteer = (props) => {
                       <div className="name">{item.title}</div>
                       <div className="time">{item.organization}</div>
                     </div>
-                    <div className="money" style={{'color': chooseColor(item.status)}}>{item.status}</div>
+                    <div className="money" style={{ 'color': chooseColor(item.status) }}>{item.status}</div>
                   </div>)}
               </div>
             </div>

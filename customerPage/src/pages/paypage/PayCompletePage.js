@@ -8,6 +8,7 @@ import "./paycompletepage.css";
  **/
 
 export const PayCompletePage = (props) => {
+  const queryParams = new URLSearchParams(window.location.search);
   return (
     <div className="paycomplete">
       <PayHeader type="xacnhan" />
@@ -20,7 +21,7 @@ export const PayCompletePage = (props) => {
           Chúng tôi chân thành cảm ơn tấm lòng của bạn. <br /> Hãy theo dõi sự
           đóng góp của bạn trên website của chúng tôi
         </div>
-        <Link to="/analysic">Theo dõi chương trình này</Link>
+        <Link to={"/analysic?id=" + queryParams.get('id')}>Theo dõi chương trình này</Link>
       </div>
     </div>
   );

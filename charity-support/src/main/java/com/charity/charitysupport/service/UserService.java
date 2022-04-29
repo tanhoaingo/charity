@@ -1,9 +1,13 @@
 package com.charity.charitysupport.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import com.charity.charitysupport.DTO.ChangePasswordRequest;
+import com.charity.charitysupport.DTO.DonationOfUser;
 import com.charity.charitysupport.DTO.Profile;
+import com.charity.charitysupport.entity.Donation;
 import com.charity.charitysupport.entity.User;
 import com.charity.charitysupport.repository.UserRepository;
 
@@ -17,6 +21,7 @@ import lombok.AllArgsConstructor;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthService authService;
 
     public void updateProfile(Profile profile) {
         User user = userRepository.findByUsername(profile.getUsername())
@@ -47,5 +52,18 @@ public class UserService {
         String last = String.valueOf(array[array.length - 1].charAt(0)).toUpperCase();
         return array.length == 1 ? first + new Random().nextInt(19) + ".svg"
                 : first + last + new Random().nextInt(19) + ".svg";
+    }
+
+    public List<DonationOfUser> getDonations() {
+        User user = authService.getCurrentUser();
+        List<DonationOfUser> list = new ArrayList<>();
+
+        for (Donation donation : user.getDonations()) {
+            byte[] img = donation.getPost().getImages().isEmpty() ? null
+                        : PostService.decompressBytes( donation.getPost().getImages().get(0).getImgByte());
+            list.add(new DonationOfUser(donation.getPost().getId(), donation.getPost().getTitle(), img,  donation.getPost().getOrganization(), donation.getAmount()));
+        }
+
+        return list;
     }
 }

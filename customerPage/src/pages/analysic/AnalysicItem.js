@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Header } from "../../components/header/Header";
 import Chart from "react-apexcharts";
 
@@ -9,15 +9,63 @@ import { Link } from "react-router-dom";
 
 // json
 import { donateUser } from "../../assets/JsonData/donateUser";
+import axios from "axios";
 /**
  * @author
  * @function AnaLysicItem
  **/
 
 export const AnaLysicItem = (props) => {
+  const queryParams = new URLSearchParams(window.location.search);
+  const [statistic, setStatistic] = useState({
+    sumOfAmount: 0,
+    numberOfSupporter: 0,
+    numberOfVolunteer: 0,
+    supporters: [],
+    contributionStatistics: [],
+    organizations: []
+  });
+  const now = new Date();
+  const days = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  function pad(n) {
+    return (n < 10) ? ("0" + n) : n;
+  }
+  function createCategory(numberOfDays) {
+    let categories = []
+    for (let i = 1; i <= numberOfDays; i++) {
+      categories.push(`${pad(i)}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`);
+    }
+    return categories;
+  }
+
+  function createTotalData(dates, contributions) {
+    let total = [];
+    for (let i = 0; i < dates.length; i++) {
+      total.push(0);
+    }
+    contributions.map(item => {
+      if (dates.indexOf(item.createAt) > -1) {
+        total[dates.indexOf(item.createAt)] = item.total;
+      }
+    })
+    return total;
+  }
+
+  function createTimesData(dates, contributions) {
+    let times = [];
+    for (let i = 0; i < dates.length; i++) {
+      times.push(0);
+    }
+    contributions.map(item => {
+      if (dates.indexOf(item.createAt) > -1) {
+        times[dates.indexOf(item.createAt)] = item.times;
+      }
+    })
+    return times;
+  }
   // chart
 
-  const state = {
+  const [state, setState] = useState({
     series: [
       {
         type: "column",
@@ -41,41 +89,14 @@ export const AnaLysicItem = (props) => {
         height: 350,
         type: "area",
       },
-      tooltip: {
-        followCursor: true,
+      dataLabels: {
+        enabled: false,
       },
-      // dataLabels: {
-      //   enabled: true,
-      //   formatter: function (val) {
-      //     return `$${val}`
-      //   },
-      // },
       stroke: {
         curve: "smooth",
       },
       xaxis: {
-        categories: [
-          "1/12/2021",
-          "2/12/2021",
-          "3/12/2021",
-          "4/12/2021",
-          "5/12/2021",
-          "6/12/2021",
-          "7/12/2021",
-          "8/12/2021",
-          "9/12/2021",
-          "10/12/2021",
-          "11/12/2021",
-          "12/12/2021",
-          "13/12/2021",
-          "14/12/2021",
-          "15/12/2021",
-          "16/12/2021",
-          "17/12/2021",
-          "18/12/2021",
-          "19/12/2021",
-          "20/12/2021",
-        ],
+        categories: createCategory(days),
       },
       yaxis: [
         {
@@ -95,8 +116,27 @@ export const AnaLysicItem = (props) => {
         align: "left",
       },
     },
-  };
-
+  });
+  useEffect(() => {
+    axios.get("http://localhost:8080/statistic/overview/" + queryParams.get('id')).then(res => {
+      console.log(res.data);
+      setStatistic(res.data);
+            setState({
+              ...state,
+              series: [
+                {
+                  type: "column",
+                  name: "Tiền quyên góp",
+                  data: createTotalData(state.options.xaxis.categories, res.data.contributionStatistics)
+                },
+                {
+                  name: "Lượt quyên góp",
+                  data: createTimesData(state.options.xaxis.categories, res.data.contributionStatistics)
+                },
+              ]
+            })
+    })
+  }, []);
   return (
     <div className="analysic-item-page">
       <Header type="analysic" />
@@ -132,14 +172,14 @@ export const AnaLysicItem = (props) => {
 
               <div className="option-tab">
                 <div className="tab-btn active">
-                  <Link to="/analysic">Tổng quan</Link>
+                  <Link to={"/analysic?id=" + queryParams.get('id')}>Tổng quan</Link>
                 </div>
                 <div className="tab-btn">
-                  <Link to="/user">Danh sách ủng hộ</Link>
+                  <Link to={"/user?id=" + queryParams.get('id')}>Danh sách ủng hộ</Link>
                 </div>
-                <div className="tab-btn">
-                  <Link to="/statement">Sao kê</Link>
-                </div>
+{/*                 <div className="tab-btn">
+                  <Link to={"/statement?id=" + queryParams.get('id')}>Sao kê</Link>
+                </div> */}
                 {/* <div className="tab-btn">
                   <Link to="/achievement">Thành quả</Link>
                 </div> */}
@@ -157,7 +197,7 @@ export const AnaLysicItem = (props) => {
                 </div>
 
                 <div class="cardBox">
-                  <div class="card">
+{/*                   <div class="card">
                     {" "}
                     <div class="iconBx">
                       <ion-icon name="eye-outline"></ion-icon>
@@ -166,13 +206,13 @@ export const AnaLysicItem = (props) => {
                       <div class="numbers">1,504</div>
                       <div class="cardName">Lượt truy cập</div>
                     </div>
-                  </div>
+                  </div> */}
                   <div class="card">
                     <div class="iconBx">
                       <i class="fas fa-child"></i>
                     </div>
                     <div>
-                      <div class="numbers">84</div>
+                      <div class="numbers">{statistic.numberOfVolunteer}</div>
                       <div class="cardName">Tình nguyện viên</div>
                     </div>
                   </div>
@@ -182,7 +222,7 @@ export const AnaLysicItem = (props) => {
                       <ion-icon name="cash-outline"></ion-icon>
                     </div>
                     <div>
-                      <div class="numbers money">17.000.000 VNĐ</div>
+                      <div class="numbers money">{statistic.sumOfAmount.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")} VNĐ</div>
                       <div class="cardName">Tiền quyên góp</div>
                     </div>
                   </div>
@@ -192,8 +232,8 @@ export const AnaLysicItem = (props) => {
                       <i class="fas fa-hand-holding-heart"></i>
                     </div>
                     <div>
-                      <div class="numbers">136</div>
-                      <div class="cardName">Lượt quyên góp</div>
+                      <div class="numbers">{statistic.numberOfSupporter}</div>
+                      <div class="cardName">Người quyên góp</div>
                     </div>
                   </div>
                 </div>
