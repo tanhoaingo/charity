@@ -42,7 +42,7 @@ export const ItemHomePage = ({ ...props }) => {
           <div className="target">
             <div className="target__txt">Mục tiêu</div>
             <div className="target__detail">
-              <span> {props.post.contribution?.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")} đồng</span>/ {props.post.expectation?.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")} đồng
+              <span> {props.post.contribution?.toFixed(0).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")} đồng</span>/ {props.post.expectation?.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")} đồng
             </div>
           </div>
 

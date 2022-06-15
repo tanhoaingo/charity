@@ -36,6 +36,11 @@
   display: flex;
   align-items: center;
 }
+.header-page-session .title2 {
+  display: flex;
+  align-items: center;
+  padding-left: 45px;
+}
 .header-page-session .title > h2 {
   margin-top: 40px;
   text-align: center;

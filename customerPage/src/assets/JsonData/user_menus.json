@@ -1,18 +1,18 @@
 [
   {
     "icon": "bx bx-user",
-    "content": "Profile",
+    "content": "Tài khoản",
     "link": "/profile"
   },
   {
     "icon": "bx bx-wallet-alt",
-    "content": "ADMIN",
+    "content": "Thống kê",
     "link": "/dashboard"
   },
 
   {
     "icon": "bx bx-log-out-circle bx-rotate-180",
-    "content": "Logout",
+    "content": "Đăng xuất",
     "link": "/"
   }
 ]

@@ -9,3 +9,19 @@
 #9 Vào admin rồi quay lại trang chủ bị lỗi
 #10 Lúc update post ko được xoá hết hình ảnh
 #11 Chưa test thống kê Tổ chức hoạt động tốt nhất
+
+
+npm install --save-dev hardhat @nomiclabs/hardhat-waffle ethereum-waffle chai @nomiclabs/hardhat-ethers ethers
+
+React.js
+Spring Boot
+Mysql
+Node.js
+Hardhat
+Ethers.js
+Mailtrap
+Alchemy
+Figma
+
+8'42
+1'14

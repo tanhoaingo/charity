@@ -89,7 +89,7 @@ export const ProfileVolunteer = (props) => {
         </div>
         <div className="content">
           {" "}
-          <h1 className="title">Đăng kí tình nguyện viên</h1>
+          <h1 className="title">Đăng ký tình nguyện viên</h1>
           {volunteers.map(volunteer =>
             <div className="chuongtrinh">
               <img

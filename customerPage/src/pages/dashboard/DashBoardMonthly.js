@@ -296,9 +296,9 @@ export const DashBoardMonthly = (props) => {
                               pauseOnHover
                             />
                           </div>
-                          <a href="#" onClick={notify} class="btn btn-export">
+{/*                           <a href="#" onClick={notify} class="btn btn-export">
                             Xuất file
-                          </a>
+                          </a> */}
                         </div>
                         <table {...getTableProps()} className="monthly">
                           <thead>

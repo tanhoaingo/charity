@@ -78,7 +78,7 @@ export const COLUMNS = [
     Cell: (tableProps) => (
       <span
         className={
-          tableProps.row.original.remainingDay === 0
+          tableProps.row.original.remainingDay <= 0
             ? "status d0"
             : tableProps.row.original.remainingDay < 3
               ? "status d3"
@@ -87,7 +87,7 @@ export const COLUMNS = [
                 : "status d100"
         }
       >
-        {tableProps.row.original.remainingDay === 0
+        {tableProps.row.original.remainingDay <= 0
           ? "đã hoàn thành"
           : "còn " + tableProps.row.original.remainingDay + " ngày"}
       </span>
@@ -184,7 +184,7 @@ export const COLUMNS = [
           <Link to={"/post?id=" + tableProps.row.original.id}>
             <i class="btn-see far fa-eye"></i>
           </Link>
-          <Link to="/analysic">
+          <Link to={"/analysic?id=" + tableProps.row.original.id}>
             <i class="btn-see fas fa-chart-line"></i>
           </Link>
 

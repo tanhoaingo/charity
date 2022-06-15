@@ -92,7 +92,7 @@ export const ProfileDonate = (props) => {
               </div>
 
               <div className="col3">
-                <p className="price">Số tiền: {donation.amount.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")} VNĐ</p>
+                <p className="price">Số tiền: {donation.amount.toFixed(0).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")} VNĐ</p>
                 <Link to={"/post?id=" + donation.postId}>Xem chi tiết chương trình</Link>
               </div>
             </div>)}

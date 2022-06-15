@@ -18,7 +18,7 @@ export const RegisterOrgnizationPage = (props) => {
       <Header link="volunteer" />
       <div className="voluteer_page">
         <div className="volunteer__title">
-          <h1>Đăng kí </h1>
+          <h1>Đăng ký </h1>
         </div>
 
         <div className="volunteer__body">

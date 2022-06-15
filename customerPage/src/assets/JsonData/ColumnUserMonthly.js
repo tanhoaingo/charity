@@ -34,7 +34,7 @@ export const COLUMNS = [
     Header: "Tổng tiền",
     Footer: "total",
     accessor: "total",
-    Cell: (tableProps) => tableProps.row.original.total.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.") + " VNĐ"
+    Cell: (tableProps) => tableProps.row.original.total.toFixed(0).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.") + " VNĐ"
   },
   {
     Header: "Số lần",

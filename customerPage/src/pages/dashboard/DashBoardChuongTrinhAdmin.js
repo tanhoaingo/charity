@@ -38,6 +38,7 @@ import { COLUMNS } from "../../assets/JsonData/ColumnPostAdmin";
 import { Filter } from "../analysic/Filter";
 import { DashBoardTopNav } from "./DashBoardTopNav";
 import { getEntire } from '../../action/post'
+import axios from "axios";
 /**
  * @author
  * @function DashBoardChuongTrinhAdmin
@@ -200,6 +201,14 @@ export const DashBoardChuongTrinhAdmin = (props) => {
   const handleDeleteDate = () => {
     setDate("");
   };
+  
+  useEffect(() => {
+    axios.get("http://localhost:8080/auth/role").then(res => {
+      if(!res.data){
+        window.location.href = "/";
+      }
+    });
+  },[]);
   return (
     <div>
       <div className="dashboard">
@@ -281,9 +290,9 @@ export const DashBoardChuongTrinhAdmin = (props) => {
                               pauseOnHover
                             />
                           </div>
-                          <a href="#" onClick={notify} class="btn btn-export">
+{/*                           <a href="#" onClick={notify} class="btn btn-export">
                             Xuất file
-                          </a>
+                          </a> */}
                         </div>
                         <table
                           {...getTableProps()}

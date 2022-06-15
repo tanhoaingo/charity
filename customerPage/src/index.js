@@ -23,7 +23,7 @@ axios.interceptors.request.use((request) => {
 axios.interceptors.response.use((response) => {
   return response;
 }, (error) => {
-  if ((error.response.status === 401 || error.response.status === 403) && localStorage.getItem("REFRESH_TOKEN")) {
+  /* if ((error.response.status === 401 || error.response.status === 403) && localStorage.getItem("REFRESH_TOKEN")) {
     axios.post("http://localhost:8080/auth/refresh/token", { username: localStorage.getItem('USERNAME'), token: localStorage.getItem('REFRESH_TOKEN') }).then(res => {
       if (res.data.length !== 0) {
         localStorage.setItem('USERNAME', res.data.username);
@@ -55,7 +55,7 @@ axios.interceptors.response.use((response) => {
     localStorage.removeItem("REFRESH_TOKEN");
     window.location.href = "/login";
   }
-  return error;
+  return error; */
 });
 
 ReactDOM.render(

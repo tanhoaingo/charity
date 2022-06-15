@@ -74,7 +74,7 @@ export const Login = (props) => {
 
                 <button
                   type="submit"
-                  className="login_btn"
+                  className="button-19"
                 >
                   Đăng nhập
                 </button>

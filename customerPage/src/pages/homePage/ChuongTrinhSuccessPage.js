@@ -18,7 +18,7 @@ export const ChuongTrinhSuccessPage = (props) => {
       <Header type="createpost" />
       <div className="voluteer_page">
         <div className="volunteer__title">
-          <h1>Đăng kí tham gia tình nguyện viên</h1>
+          <h1>Đăng ký tham gia tình nguyện viên</h1>
         </div>
 
         <div className="volunteer__body success">

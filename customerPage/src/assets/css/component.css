@@ -17,9 +17,10 @@
   outline: none;
   position: relative;
   text-align: center;
-  color: #ccc;
-  font-weight: normal;
+  color: rgb(161, 159, 159);
+  font-weight: bold;
   overflow: hidden;
+  margin-left: 12px;
 }
 
 .button-box #btn {

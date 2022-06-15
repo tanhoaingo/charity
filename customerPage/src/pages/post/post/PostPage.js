@@ -124,7 +124,7 @@ export const PostPage = (props) => {
               <p>Lượt Ủng Hộ</p>
             </div>
             <div className="item">
-              <span>{post.contribution.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")} / {post.expectation.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")} VNĐ</span>
+              <span>{post.contribution.toFixed(0).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")} / {post.expectation.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")} VNĐ</span>
               <p>Đã quyên góp</p>
             </div>
             <div className="item">
@@ -138,7 +138,7 @@ export const PostPage = (props) => {
                 window.scrollTo(0, 0);
               }}
               className="report"
-              to="/analysic"
+              to={"/analysic?id=" + queryParams.get('id')}
             >
               <i class="bx bxs-report"></i> Xem báo cáo
             </Link>
@@ -242,7 +242,7 @@ export const PostPage = (props) => {
                     <div className="name">{donation.isAnonymous ? "Ẩn danh" : donation.fullname}</div>
                     <div className="time">{new Date(donation.createAt).toLocaleDateString("vi", "VN")}</div>
                   </div>
-                  <div className="money">{donation.amount.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")} VNĐ</div>
+                  <div className="money">{donation.amount.toFixed(0).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")} VNĐ</div>
                 </div>
               ))}
             </div>

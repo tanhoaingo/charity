@@ -4,16 +4,22 @@ import { Header } from "../../components/header/Header";
 import post1Img from "../../assets/img/homePagePost/post1.jpg";
 import donateReceive1 from "../../assets/img/donateReceive.png";
 import donateReceive from "../../assets/img/donategif.gif";
-
+import { SiEthereum } from "react-icons/si";
 import "./donatepage.css";
 import axios from "axios";
 import { PayPage } from "../paypage/PayPage";
+import useTransaction from "../../util/transaction/useTransaction";
 /**
  * @author
  * @function DonatePage
  **/
 
 export const DonatePage = (props) => {
+  const {
+    connectWallet,
+    currentAccount,
+    sendTransaction,
+  } = useTransaction();
   const [donation, setDonation] = useState({
     username: localStorage.getItem('USERNAME'),
     postId: 0,
@@ -64,40 +70,51 @@ export const DonatePage = (props) => {
       [name]: value
     })
   }
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     let err = {};
-    if(donation.amount < 1){
+    if (donation.amount === 0) {
       err.amount = "Số tiền phải lớn hơn 0";
     }
-    if(!donation.paymentMethod.trim()){
+    if (!donation.paymentMethod.trim()) {
       err.paymentMethod = "Vui lòng chọn phương thức thanh toán";
     }
     setError(err);
     if (Object.keys(err).length === 0) {
       console.log(donation);
-      axios({
-        method: 'POST', url: "http://localhost:8080/donation/create", data: donation, headers: { "Navigation": "http://localhost:3001/paying-complete?id=" + donation.postId }
-    }).then(() => {
-        window.location.href = "/paying-complete?id=" + donation.postId;
-    });
+      if (optionDonate === 1) {
+        axios({
+          method: 'POST', url: "http://localhost:8080/donation/create", data: donation, headers: { "Navigation": "http://localhost:3001/paying-complete?id=" + donation.postId }
+        }).then(() => {
+          window.location.href = "/paying-complete?id=" + donation.postId;
+        });
+      } else {
+        await sendTransaction(donation.amount, donation.message);
+        axios.get("https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=VND").then(res => {
+          axios({
+            method: 'POST', url: "http://localhost:8080/donation/create", data: { ...donation, amount: donation.amount * res.data.VND }, headers: { "Navigation": "http://localhost:3001/paying-complete?id=" + donation.postId }
+          }).then(() => {
+            window.location.href = "/paying-complete?id=" + donation.postId;
+          });
+        })
+      }
     }
   }
   useEffect(() => {
-    axios.get("http://localhost:8080/auth/isLoggin").then(res =>{
-      if(res.data){
+    axios.get("http://localhost:8080/auth/isLoggin").then(res => {
+      if (res.data) {
         setDonation({
           ...donation,
           postId: queryParams.get('id')
         })
         axios.get("http://localhost:8080/post/get/" + queryParams.get('id')).then(res => {
           setPost(res.data);
-    
+
           let items = [];
           res.data.images.map(image => items.push({ url: 'data:image/jpeg;base64,' + image.imgByte }));
           setImages(items);
         });
-      } else{
+      } else {
         window.location.href = "/login";
       }
     })
@@ -115,12 +132,23 @@ export const DonatePage = (props) => {
   const leftClick = () => {
     btn.current.style.left = "0";
     setOptionDonate(1);
+    setDonation({
+      ...donation,
+      paymentMethod: ""
+    });
     btn.current.style.width = "90px";
   };
-  const rightClick = () => {
-    btn.current.style.left = "90px";
-    btn.current.style.width = "120px";
-    setOptionDonate(2);
+  const rightClick = async () => {
+    const isLogged = await connectWallet();
+    if (isLogged) {
+      btn.current.style.left = "90px";
+      btn.current.style.width = "120px";
+      setOptionDonate(2);
+      setDonation({
+        ...donation,
+        paymentMethod: "Ethereum"
+      });
+    }
   };
   return (
     <div>
@@ -153,6 +181,11 @@ export const DonatePage = (props) => {
               <img src={donateReceive} alt="" />
               <h2>Tiến hành ủng hộ</h2>
             </div>
+            {optionDonate === 2 && (
+              <div className="title2">
+                <SiEthereum fontSize={40} color="#000000" />
+                <h3 style={{ "margin-left": "25px" }}>{currentAccount}</h3>
+              </div>)}
           </div>
           <form onSubmit={handleSubmit}>
             <div className="donate-option__body">
@@ -183,21 +216,21 @@ export const DonatePage = (props) => {
                   }
                   onClick={leftClick}
                 >
-                  Một lần
+                  VNĐ
                 </button>
                 <button
                   type="button"
                   class={optionDonate === 2 ? "toggle-btn active" : "toggle-btn"}
                   onClick={rightClick}
                 >
-                  Hàng tháng
+                  ETH
                 </button>
               </div>
 
               <div className="option-money">
                 <div className="selected-radio">
                   {/* text */}
-                  <p style={{ 'margin-top': '25px' }}>VNĐ</p>
+                  <p style={{ 'margin-top': '25px' }}>{optionDonate === 1 ? "VNĐ" : "ETH"}</p>
                   <input
                     // value={new Intl.NumberFormat("vi-VN", {
                     //   style: "currency",
@@ -222,47 +255,48 @@ export const DonatePage = (props) => {
                     }}
                   />
                   {/* 100.000vnd */}
-                  <input
-                    type="radio"
-                    name="amount"
-                    id="1"
-                    className="hide"
-                    value={100000}
-                    onClick={handleClick}
-                    checked={checked[100000]}
-                  />
-                  <label htmlFor="1" className="lbl-radio">
-                    100.000 VNĐ
-                  </label>
+                  {optionDonate === 1 && (<>
+                    <input
+                      type="radio"
+                      name="amount"
+                      id="1"
+                      className="hide"
+                      value={100000}
+                      onClick={handleClick}
+                      checked={checked[100000]}
+                    />
+                    <label htmlFor="1" className="lbl-radio">
+                      100.000 VNĐ
+                    </label>
 
-                  {/* 200.000vnd */}
+                    {/* 200.000vnd */}
 
-                  <input
-                    type="radio"
-                    name="amount"
-                    id="2"
-                    className="hide"
-                    value={200000}
-                    onClick={handleClick}
-                    checked={checked[200000]}
-                  />
-                  <label htmlFor="2" className="lbl-radio">
-                    200.000 VNĐ
-                  </label>
+                    <input
+                      type="radio"
+                      name="amount"
+                      id="2"
+                      className="hide"
+                      value={200000}
+                      onClick={handleClick}
+                      checked={checked[200000]}
+                    />
+                    <label htmlFor="2" className="lbl-radio">
+                      200.000 VNĐ
+                    </label>
 
-                  {/* 500.000vnd */}
-                  <input
-                    type="radio"
-                    name="amount"
-                    id="3"
-                    className="hide"
-                    value={500000}
-                    onClick={handleClick}
-                    checked={checked[500000]}
-                  />
-                  <label htmlFor="3" className="lbl-radio">
-                    500.000 VNĐ
-                  </label>
+                    {/* 500.000vnd */}
+                    <input
+                      type="radio"
+                      name="amount"
+                      id="3"
+                      className="hide"
+                      value={500000}
+                      onClick={handleClick}
+                      checked={checked[500000]}
+                    />
+                    <label htmlFor="3" className="lbl-radio">
+                      500.000 VNĐ
+                    </label></>)}
                 </div>
               </div>
               {error.amount && <p style={{ color: 'red', fontSize: 'small' }}>{error.amount}</p>}
@@ -297,7 +331,7 @@ export const DonatePage = (props) => {
                   <div className="inner-circle"></div>
                 </div>
               </div>
-              <PayPage setDonation={setDonation} donation={donation}></PayPage>
+              {optionDonate === 1 && (<PayPage setDonation={setDonation} donation={donation}></PayPage>)}
               {/* submit */}
               {error.paymentMethod && <p style={{ color: 'red', fontSize: 'small' }}>{error.paymentMethod}</p>}
               <button to="/paying" className="custom-btn pay-btn">
