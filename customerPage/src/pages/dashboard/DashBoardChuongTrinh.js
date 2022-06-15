@@ -73,7 +73,7 @@ export const DashBoardChuongTrinh = (props) => {
   ];
   const optionTime = [
     { value: "", label: "Tất cả" },
-    { value: "đã hết hạn", label: "Đã hoàn thành" },
+    { value: "đã hoàn thành", label: "Đã hoàn thành" },
     { value: "rất gần hết hạn", label: "Dưới 3 ngày" },
     { value: "sắp hết hạn", label: "Dưới 10 ngày" },
     { value: "chưa hết hạn", label: "Còn lại" },
@@ -204,7 +204,7 @@ export const DashBoardChuongTrinh = (props) => {
     <div>
       <div className="dashboard">
         <div className="dashboard__left">
-          <DashBoardTab link="postadmin" />
+          <DashBoardTab link="chuongtrinh" />
         </div>
         <div className="clear"></div>
         <div className="dashboard__body">
@@ -262,12 +262,12 @@ export const DashBoardChuongTrinh = (props) => {
                               options={optionType}
                               onChange={handleType}
                             />
-                            <Select
+{/*                             <Select
                               placeholder="Cấp thiết"
                               className="honghong type"
                               options={optionTime}
                               onChange={handleTime}
-                            />
+                            /> */}
                             {/* <button onClick={notify}>Notify!</button> */}
                             <ToastContainer
                               position="top-center"
@@ -281,9 +281,9 @@ export const DashBoardChuongTrinh = (props) => {
                               pauseOnHover
                             />
                           </div>
-                          <a href="#" onClick={notify} class="btn btn-export">
+{/*                           <a href="#" onClick={notify} class="btn btn-export">
                             Xuất file
-                          </a>
+                          </a> */}
                         </div>
                         <table
                           {...getTableProps()}

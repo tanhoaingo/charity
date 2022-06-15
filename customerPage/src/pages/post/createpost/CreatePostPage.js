@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Header } from "../../../components/header/Header";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ReactHtmlParser from "react-html-parser";
@@ -29,6 +29,13 @@ export const CreatePostPage = (props) => {
     { value: "Người khó khăn", label: "Người khó khăn" },
   ];
 
+  useEffect(() => {
+    axios.get("http://localhost:8080/auth/role").then(res => {
+      if(!res.data){
+        window.location.href = "/";
+      }
+    });
+  },[]);
   return (
     <div>
       <Header type="createpost" />

@@ -153,13 +153,11 @@ export const AnaLysicItem = (props) => {
               </Link>
               <div className="post-left">
                 <div className="image">
-                  <img src={post1Img} alt="" />
+                  <img src="https://www.1stformationsblog.co.uk/wp-content/uploads/2020/09/Charity-Image.png" alt="" />
                 </div>
               </div>
 
               <div className="title">
-                Chương trình tặng quà cho người lao động khu vực Sài Gòn và các
-                tỉnh bị giãn cách
               </div>
               {/* <div className="option" >
                 <a className="detail-btn" href="#">
@@ -222,7 +220,7 @@ export const AnaLysicItem = (props) => {
                       <ion-icon name="cash-outline"></ion-icon>
                     </div>
                     <div>
-                      <div class="numbers money">{statistic.sumOfAmount.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")} VNĐ</div>
+                      <div class="numbers money">{statistic.sumOfAmount?.toFixed(0).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")} VNĐ</div>
                       <div class="cardName">Tiền quyên góp</div>
                     </div>
                   </div>

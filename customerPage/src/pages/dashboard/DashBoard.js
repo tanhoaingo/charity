@@ -304,7 +304,7 @@ export const DashBoard = (props) => {
               <div className="total-info__detail">
                 <div className="money">
                   <span className="vnd">VNĐ</span>
-                  <span className="txt-money">{statistic.sumOfAmount.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")}</span>
+                  <span className="txt-money">{statistic.sumOfAmount?.toFixed(0).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")}</span>
                 </div>
 
                 {/* <div className="percent">
@@ -346,7 +346,7 @@ export const DashBoard = (props) => {
                       <div className="image-coin">
                         <img src={coinImg} alt="" />
                       </div>
-                      <span>{supporter.total.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")}</span>
+                      <span>{supporter.total.toFixed(0).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")}</span>
                       <div className="vnd">VNĐ</div>
                     </div>
                   </div>
@@ -383,7 +383,7 @@ export const DashBoard = (props) => {
                         <div className="image-coin">
                           <img src={coinImg} alt="" />
                         </div>
-                        <span>{organization.contribution.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")}</span>
+                        <span>{organization.contribution.toFixed(0).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")}</span>
                         <div className="vnd">VNĐ</div>
                       </div>
                     </div>)}

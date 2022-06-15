@@ -197,13 +197,11 @@ export const AnalysicUser = (props) => {
               </Link>
               <div className="post-left">
                 <div className="image">
-                  <img src={post1Img} alt="" />
+                  <img src="https://www.1stformationsblog.co.uk/wp-content/uploads/2020/09/Charity-Image.png" alt="" />
                 </div>
               </div>
 
               <div className="title">
-                Chương trình tặng quà cho người lao động khu vực Sài Gòn và các
-                tỉnh bị giãn cách
               </div>
               {/* <div className="option">
                 <a className="detail-btn" href="#">

@@ -111,7 +111,7 @@ export const Header = (props) => {
                   <div
                     className="notification-item"
                     onClick={
-                      item.content === "Logout"
+                      item.content === "Đăng xuất"
                         ? () => {
                             axios.post("http://localhost:8080/auth/logout", {username: localStorage.getItem("USERNAME"), token: localStorage.getItem("REFRESH_TOKEN")});
                             localStorage.removeItem("USERNAME");

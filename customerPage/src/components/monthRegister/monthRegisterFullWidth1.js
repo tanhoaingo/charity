@@ -35,16 +35,16 @@ export const MonthRegisterFullWidth1 = (props) => {
               <img src={month1Img} alt="" />
             </div>
             <div className="info">
-              <h4>Đăng kí tình nguyện viên</h4>
+              <h4>Đăng ký tình nguyện viên</h4>
               <p>
-                Đăng kí với chúng tôi để được trở thành tình nguyện viên của
+                Đăng ký với chúng tôi để được trở thành tình nguyện viên của
                 chương trình
               </p>
             </div>
           </div>
 
           <Link to="/volunteer">
-            <div className="btn register">Đăng kí</div>
+            <div className="btn register">Đăng ký</div>
           </Link>
         </div>
       </div>

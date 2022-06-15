@@ -33,7 +33,7 @@ export const SignUp = (props) => {
         <div className="login__bottom">
           <div className="content__wrapper">
             <div className="content__body signup">
-              <h3>Đăng kí thành viên</h3>
+              <h3>Đăng ký thành viên</h3>
               <form onSubmit={handleSignup}>
               <div className="auth-form signup">
                 <div className="signup">
@@ -78,8 +78,8 @@ export const SignUp = (props) => {
                     {errors.password && <p>{errors.password}</p>}
                   </div>
                 </div>
-                <button type="submit">
-                  Đăng kí
+                <button type="submit" className="button-19">
+                  Đăng ký
                 </button>
                 <div className="social-login">
                   <Link

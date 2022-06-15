@@ -180,6 +180,13 @@ export const DashBoardVolunteerAdmin = (props) => {
       setVolunteer(res.data);
     })
   },[]);
+  useEffect(() => {
+    axios.get("http://localhost:8080/auth/role").then(res => {
+      if(!res.data){
+        window.location.href = "/";
+      }
+    });
+  },[]);
   return (
     <div>
       <div className="dashboard">
@@ -289,9 +296,9 @@ export const DashBoardVolunteerAdmin = (props) => {
                               pauseOnHover
                             />
                           </div>
-                          <a href="#" onClick={notify} class="btn btn-export">
+{/*                           <a href="#" onClick={notify} class="btn btn-export">
                             Xuất file
-                          </a>
+                          </a> */}
                         </div>
                         <table {...getTableProps()} className="duyet">
                           <thead>

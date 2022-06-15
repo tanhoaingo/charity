@@ -307,9 +307,9 @@ export const DashBoardUser = (props) => {
                               pauseOnHover
                             />
                           </div>
-                          <a href="#" onClick={notify} class="btn btn-export">
+{/*                           <a href="#" onClick={notify} class="btn btn-export">
                             Xuất file
-                          </a>
+                          </a> */}
                         </div>
                         <table {...getTableProps()}>
                           <thead>

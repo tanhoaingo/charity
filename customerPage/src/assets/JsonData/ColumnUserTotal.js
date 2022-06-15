@@ -26,7 +26,7 @@ export const COLUMNS = [
     Footer: "money",
     accessor: "amount",
     width: 90,
-    Cell: (tableProps) => tableProps.row.original.amount.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.") + " VNĐ"
+    Cell: (tableProps) => tableProps.row.original.amount.toFixed(0).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.") + " VNĐ"
   },
   {
     Header: "Phương thức thanh toán",

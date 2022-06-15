@@ -121,7 +121,7 @@ export const HomePage = (props) => {
                       <img src={collectImg} alt="" />
                     </div>
                     <div className="info">
-                      <div className="quantity">{data.amount.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")} VNĐ</div>
+                      <div className="quantity">{data.amount?.toFixed(0).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")} VNĐ</div>
                       <div className="desc">Tổng số tiền</div>
                     </div>
                   </div>

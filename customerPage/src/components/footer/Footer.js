@@ -41,7 +41,7 @@ export const Footer = (props) => {
             <a href="#">Về chúng tôi</a>
           </li>
           <li>
-            <a href="#">Đăng kí tình nguyện viên</a>
+            <a href="#">Đăng ký tình nguyện viên</a>
           </li>
           <li>
             <a href="#">Chương trình từ thiện</a>

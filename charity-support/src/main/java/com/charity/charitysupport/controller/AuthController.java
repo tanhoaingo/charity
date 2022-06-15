@@ -8,6 +8,8 @@ import com.charity.charitysupport.DTO.RegisterRequest;
 import com.charity.charitysupport.service.AuthService;
 import com.charity.charitysupport.service.RefreshTokenService;
 
+import java.net.URI;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,7 +37,7 @@ public class AuthController {
     @GetMapping("/accountVerification/{token}")
     public ResponseEntity<String> verifyAccount(@PathVariable String token) {
         authService.verifyAccount(token);
-        return ResponseEntity.status(HttpStatus.OK).body("Tài khoản được kích hoạt thành công");
+        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create("http://localhost:3001/login")).build();
     }
 
     @PostMapping("/login")

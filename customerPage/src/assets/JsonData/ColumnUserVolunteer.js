@@ -66,7 +66,7 @@ export const COLUMNS = [
     Header: "Tổng điểm",
     Footer: "Tổng điểm",
     accessor: "point",
-    Cell: (tableProps) => tableProps.row.original.point.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")
+    Cell: (tableProps) => tableProps.row.original.point.toFixed(0).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")
   },
   // {
   //   Header: "type",
